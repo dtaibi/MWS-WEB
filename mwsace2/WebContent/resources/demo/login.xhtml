@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<composite:interface>
+		<composite:attribute name="uvalue" required="true"/>
+		<composite:attribute name="pvalue" required="true"/>
+		<composite:attribute name="action" required="true" method-signature="java.lang.String f()"/>
+		<composite:attribute name="submitlabel"/>
+	</composite:interface>
+
+	<composite:implementation>
+		<div class="alert alert-info">
+			Please login with your Username and Password.
+		</div>
+    	<h:form styleClass="form-horizontal">
+    		<fieldset>
+    		<div class="input-prepend" title="Username" >
+				<span class="add-on"><i class="icon-user"></i></span>
+				<h:inputText styleClass="input-large span10" value="#{cc.attrs.uvalue}" />
+			</div>
+			<div class="clearfix"></div>
+			<div class="input-prepend" title="Password">
+				<span class="add-on"><i class="icon-lock"></i></span>
+				<h:inputSecret styleClass="input-large span10" value="#{cc.attrs.pvalue}" />
+			</div>
+			<div class="clearfix"></div>
+			<p class="center span5">
+				<h:commandButton action="#{cc.attrs.action}" styleClass="btn btn-primary" value="#{cc.attrs.submitlabel}" />
+			</p>
+    		
+    		</fieldset>
+    	</h:form>
+	</composite:implementation>
+</html>

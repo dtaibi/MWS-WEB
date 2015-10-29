@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:composite="http://java.sun.com/jsf/composite"
+	  xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+	<composite:interface>
+		<composite:attribute name="label"/>
+		<composite:attribute name="values" required="true"/>
+		<composite:attribute name="extend" required="true" method-signature="java.lang.String f()"/>
+		<composite:attribute name="item" required="true"/>
+		<composite:attribute name="list" required="true"/>
+		<composite:attribute name="searchResult" required="true"/>
+		<composite:attribute name="action" required="true" method-signature="java.lang.String f()"/>
+		<composite:attribute name="submitlabel"/>
+	</composite:interface>
+
+	<composite:implementation>
+    	
+    		<h:outputText value="#{cc.attrs.label}" />
+    		<br />
+   	 		<ui:repeat varStatus="loop" value="#{cc.attrs.values}">
+    			<h:inputText value="#{cc.attrs.values[loop.index]}"/> <br />
+			</ui:repeat>
+    		<h:commandButton value="Add Term">
+        		<f:ajax listener="#{cc.attrs.extend}" execute="@form" render="@form" />
+    		</h:commandButton>
+    		<br /><br />
+    			<h:selectOneRadio value="#{cc.attrs.item}" style="width: 200px">
+  					<f:selectItems value="#{cc.attrs.list}" var="c" itemLabel="#{c}" itemValue="#{c}"  />
+				</h:selectOneRadio>
+    		<br />
+    		<h:commandButton value="#{cc.attrs.submitlabel}" >
+        		<f:ajax listener="#{cc.attrs.action}" execute="@form" render="@form :out :out2 :checkform" />
+    		</h:commandButton>
+			<br /><br />
+	</composite:implementation>
+</html>

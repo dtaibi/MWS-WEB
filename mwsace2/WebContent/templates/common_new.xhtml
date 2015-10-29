@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+      
+		<h:head>
+		<title><ui:insert name="pageTitle">Page Title</ui:insert></title>
+		<!-- The styles -->
+			
+		<h:outputStylesheet library="theme" name="css/bootstrap-cerulean.css" />
+		<style type="text/css">
+			  body {
+				padding-bottom: 40px;
+			  }
+			  .sidebar-nav {
+				padding: 9px 0;
+			  }
+		</style>
+		<h:outputStylesheet library="theme" name="css/bootstrap-responsive.css" />
+		<h:outputStylesheet library="theme" name="css/charisma-app.css" />
+		<h:outputStylesheet library="theme" name="css/jquery-ui-1.8.21.custom.css" />
+		<h:outputStylesheet library="theme" name="css/fullcalendar.css" />
+		<h:outputStylesheet library="theme" name="css/fullcalendar.print.css" media="print" /> 
+		<h:outputStylesheet library="theme" name="css/chosen.css" />
+		<h:outputStylesheet library="theme" name="css/uniform.default.css" />
+		<h:outputStylesheet library="theme" name="css/colorbox.css" />
+		<h:outputStylesheet library="theme" name="css/jquery.cleditor.css" />
+		<h:outputStylesheet library="theme" name="css/jquery.noty.css" />
+		<h:outputStylesheet library="theme" name="css/noty_theme_default.css" />
+		<h:outputStylesheet library="theme" name="css/elfinder.min.css" />
+		<h:outputStylesheet library="theme" name="css/elfinder.theme.css" />
+		<h:outputStylesheet library="theme" name="css/jquery.iphone.toggle.css" />
+		<h:outputStylesheet library="theme" name="css/opa-icons.css" />
+		<h:outputStylesheet library="theme" name="css/uploadify.css" />										
+			
+			<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+			<!--[if lt IE 9]>
+			  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+			<![endif]-->
+		
+			<!-- The fav icon -->
+		<link href="#{resource['theme:img/favicon.ico']}" rel="shortcut icon" type="image/x-icon" />
+	</h:head>
+
+<body bgcolor="#ffffff">
+	<div class="container-fluid">
+		<div class="row-fluid">
+		
+			<div class="row-fluid">
+				<div class="span12 center login-header">
+					<h2><ui:insert name="pageHeader">Page Header</ui:insert></h2>
+				</div><!--/span-->
+			</div><!--/row-->
+			
+			<div class="row-fluid">
+				<div class="well span5 center login-box">
+					<ui:insert name="body">Page Body</ui:insert>
+				</div><!--/span-->
+			</div><!--/row-->
+		</div><!--/fluid-row-->
+	</div><!--/.fluid-container-->
+</body>
+</html>

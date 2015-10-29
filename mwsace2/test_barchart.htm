@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
+    <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/js/flot/excanvas.min.js"></script><![endif]-->
+     
+    <script type="text/javascript" src="WebContent/resources/theme/js/jquery.flot.min.js"></script> 
+     
+    <script type="text/javascript">
+        //******* 2012 Average Temperature - BAR CHART
+        var data = [[0, 11],[1, 15],[2, 25],[3, 24],[4, 13],[5, 18]];
+        var dataset = [{ label: "2012 Average Temperature", data: data, color: "#5482FF" }];
+        var ticks = [[0, "London"], [1, "New York"], [2, "New Delhi"], [3, "Taipei"],[4, "Beijing"], [5, "Sydney"]];
+        var data = [ { label: "en.wikipedia.org", data: [[1,2]]}, { label: "www.palermospizza.com", data: [[2,1]]} ]; // ,{ label: "www.palermospizza.com", data: [1,1]} ]; // ,{ label: "palermo.com", data: 2} ,{ label: "www.lobservateur.com", data: 1} ,{ label: "www.tripadvisor.com", data: 2} ,{ label: "www.lonelyplanet.com", data: 1} ,{ label: "www.palermorestaurant.com", data: 1} ,{ label: "palermorestaurant.net", data: 2} ,{ label: "wikitravel.org", data: 2} ,{ label: "www.liveatpalermo.com", data: 1} ,{ label: "www.bestofsicily.com", data: 1} ,{ label: "www.thepalermoapts.com", data: 1} ,{ label: "www.mapquest.com", data: 1} ,{ label: "www.palermoguitars.com", data: 1} ,{ label: "www.buenosaires54.com", data: 1} ,{ label: "www.opentable.com", data: 1} ,{ label: "www.britannica.com", data: 1} ,{ label: "dineatpalermo.com", data: 1} ,{ label: "www.hotels.com", data: 1} ,{ label: "dictionary.reference.com", data: 1} ,{ label: "espnfc.com", data: 1} ,{ label: "www.weather.com", data: 1} ,{ label: "sports.yahoo.com", data: 1} ,{ label: "www.lifeinitaly.com", data: 1} ,{ label: "www.goal.com", data: 2} ,{ label: "palermoshowstables.com", data: 2} ,{ label: "www.city-data.com", data: 2} ,{ label: "www.oliviapalermo.com", data: 1} ,{ label: "www.booking.com", data: 1} ,{ label: "www.ronbow.com", data: 1} ,{ label: "www.buenosaireshabitat.com", data: 1} ,{ label: "www.palermotower.com", data: 1} ,{ label: "www.world-guides.com", data: 1} ,{ label: "palermo-pizza.com", data: 1} ,{ label: "www.palermochicago.com", data: 1} ,{ label: "palermobakery.com", data: 1} ,{ label: "www.palermo-pizza.com", data: 1} ,{ label: "www.ivoryhomes.com", data: 1} ,{ label: "www.dineatpalermo.com", data: 1} ,{ label: "www.venere.com", data: 1} ,{ label: "www.fodors.com", data: 2} ,{ label: "www.orinswift.com", data: 1} ,{ label: "california.hometownlocator.com", data: 1} ,{ label: "palermos95th.com", data: 1} ,{ label: "www.target.com", data: 1} ,{ label: "www.newadvent.org", data: 1} ,{ label: "mypalermocondo.vpmrents.com", data: 1} ,{ label: "allaboutar.com", data: 1} ,{ label: "ballard.palermorestaurant.com", data: 1} ,{ label: "www.ebay.com", data: 1} ,{ label: "palermo.theoffside.com", data: 1} ,{ label: "www.eatpizzapalermo.com", data: 1} ,{ label: "www.zillow.com", data: 1} ,{ label: "www.thefreedictionary.com", data: 1} ,{ label: "www.retractableawnings.com", data: 1} ,{ label: "www.wunderground.com", data: 1} ,{ label: "www.yelp.com", data: 1} ,{ label: "palermo-deli.com", data: 1} ,{ label: "travel.yahoo.com", data: 1} ,{ label: "www.merriam-webster.com", data: 1} ,{ label: "palermo.tarragon.com", data: 1} ,{ label: "www.expedia.com", data: 1} ,{ label: "capitolhill.palermorestaurant.com", data: 1} ,{ label: "www.maine.gov", data: 1} ,{ label: "www.palermos95th.com", data: 1} ,{ label: "townofpalermo.org", data: 1} ,{ label: "www.trulia.com", data: 1} ,{ label: "www.uefa.com", data: 1} ,{ label: "www.ncl.com", data: 1} ,{ label: "www.palermocalifornia.com", data: 1} ,{ label: "commons.wikimedia.org", data: 1} ,{ label: "www.century21.com", data: 1} ,{ label: "palermosubs.com", data: 1} ,{ label: "palermo-ristorante.com", data: 1} ,{ label: "maineanencyclopedia.com", data: 1} ,{ label: "www.virtualtourist.com", data: 1} ,{ label: "www.catholic.org", data: 1} ,{ label: "www.buenostours.com", data: 1} ,{ label: "www.audioenglish.org", data: 1} ,{ label: "palermospizzamenu.com", data: 1} ,{ label: "www.gentracer.com", data: 1} ,{ label: "www.timeanddate.com", data: 1} ,{ label: "www.palermostomatopie.com", data: 1} ,{ label: "www.soccerpro.com", data: 1} ,{ label: "www.ancestry.com", data: 1} ,{ label: "www.seepalermo.com", data: 1} ,{ label: "www.palermolawoffices.com", data: 1} ,{ label: "www.allmenus.com", data: 1} ,{ label: "education.yahoo.com", data: 1} ,{ label: "losangeles.menupages.com", data: 1} ,{ label: "jewishencyclopedia.com", data: 1} ,{ label: "www.yourdictionary.com", data: 1} ,{ label: "www.frommers.com", data: 1}  ];  
+        // var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; $.plot($("#chartpie1"), data, options ); 
+
+  
+         
+        var baroptions = { series: { lines: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} };		
+        
+        var options = {
+            series: {
+                bars: {
+                    show: true
+                }
+            },
+            bars: {
+                align: "center",
+                barWidth: 0.5
+            },
+            legend: {
+                noColumns: 0,
+                labelBoxBorderColor: "#000000",
+                position: "nw"
+            },
+            grid: {
+                hoverable: true,
+                borderWidth: 2,
+                backgroundColor: { colors: ["#ffffff", "#EDF5FF"] }
+            }
+        };
+ 
+        $(document).ready(function () {
+            // $.plot($("#flot-placeholder"), dataset, options);
+             
+            $.plot($("#flot-placeholder"), data, baroptions );
+        });
+
+    </script>
+</head>
+<body>
+    <div style="width:450px;height:300px;text-align:center;margin:10px">       
+        <div id="flot-placeholder" style="width:100%;height:100%;"></div>       
+    </div>
+</body>
+</html>

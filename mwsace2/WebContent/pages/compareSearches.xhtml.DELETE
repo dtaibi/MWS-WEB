@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<f:metadata>
+    <f:viewParam name="resultId" value="#{comparesearches.resultId}" />
+    <f:event type="preRenderView" listener="#{comparesearches.loadSearch(1)}"/>
+</f:metadata>
+
+<ui:composition template="/templates/common_pages.xhtml">
+	<ui:define name="pageTitle">MWS - Basic Search page</ui:define>
+	<ui:define name="pageHeader">Basic Search</ui:define>
+
+	<ui:define name="body">
+		<div style="float:left;">
+		
+		</div>
+		
+		<h:panelGroup id="ssettingss">
+			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px;" rendered="#{not empty comparesearches.searchsettings}">
+				<p><h:outputText value="#{comparesearches.searchsettings}" escape="false"/></p>
+			</h:panelGroup>
+		</h:panelGroup>
+		<div style="float:left; clear: both">
+			<h:graphicImage value="#{resource['theme:img/open.png']}" width="24" alt="opensearchbutton" onclick="openOpenForm()" />
+ 			<h:form id="oSearch" ajaxSubmit="true" styleClass="openform">
+				<table border="0">
+					<tr>
+						<td>
+							<h:outputText value="#{msgs.osearches}" />
+						</td>
+    					<td>
+    						<h:selectOneMenu value="#{comparesearches.searchsel}">
+   								<f:selectItems value="#{comparesearches.userSearches}" var="c" itemLabel="#{c.nome}" itemValue="#{c.id}" />
+   							</h:selectOneMenu> 
+						</td>
+						<td>
+							<h:commandButton value="Open Search" >
+								<f:ajax execute="@form" render="@form :chartpielist :out2img" listener="#{comparesearches.openSearch}" />
+    						</h:commandButton>
+	    				</td>
+    				</tr>
+    			</table>
+			</h:form>		
+		</div>
+		<a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}" alt="ai" />
+            </f:facet>
+        </a4j:status>
+	</ui:define>
+
+<ui:define name="chartpanel2">
+	
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Video Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn2"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn2">
+			<div class="box-content">
+				
+					<div id="myTabContent2" class="tab-content">
+						<div class="tab-pane active" id="info2">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<h:panelGroup id="chartvideopielist">
+								<c:forEach items="#{comparesearches.searches}" var="sear" varStatus="status">
+									<div>
+										<div id="colo3" style="float: left; width: 400px">
+											<div id="chartpie2_#{sear.id}" style="width: 300px; height: 250px"></div>
+											<br />
+											<p id="showInteractive2">value</p>	
+										</div>
+										<div id="colo4" style="float: left;">
+											<div id="listofsite2" >
+												<h:form ajaxSubmit="true">
+												<div style="height: 50px;">
+													<h:commandButton value="Refine Search">
+														<f:ajax execute="@form" render="@form :out2video" listener="#{comparesearches.refineVideoSearch}" />
+		    										</h:commandButton>
+		    									</div>
+		    									<div style="height: 250px; width: auto; overflow: auto;">
+													<h:selectManyCheckbox layout="pageDirection" value="#{comparesearches.getSiteSelectedlist(sear,'siteSelectedlist2')}">
+														<f:selectItems value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist2')}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+													</h:selectManyCheckbox>
+												</div>	
+												</h:form>
+											</div>
+										</div>
+									</div>
+							</c:forEach>
+							</h:panelGroup>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</ui:define>
+
+<ui:define name="chartpanel1">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Web Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn1" class="icon-chevron-down"></i></a> 
+				<a href="#"	class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn1">
+			<div class="box-content">
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info2">Pie</a></li>
+				</ul>
+				
+				<div id="myTabContent2" class="tab-content">
+				<div class="tab-pane active" id="info2">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<h:panelGroup id="chartwebpielist">
+								<c:forEach items="#{comparesearches.searches}" var="sear" varStatus="status">
+									<div id="colo1" style="float: left; width: 400px">
+										<div id="chartpie1_#{sear.id}" style="width: 300px; height: 250px"></div>
+										<br />
+										<p id="showInteractive1">value</p>	
+									</div>
+									<div id="colo2" style="float: left;">
+										<div id="listofsite1">
+											<h:form ajaxSubmit="true">
+												<div style="height: 50px;">
+													<h:commandButton value="Refine Search" action="#{comparesearches.refineWebSearch('REFINE_PIE')}">
+														<f:ajax execute="@form" render="@form" />
+		    										</h:commandButton>
+		    									</div>
+		    									<div style="height: 250px; width: auto; overflow: auto;">
+													<h:selectManyCheckbox layout="pageDirection" value="#{comparesearches.getSiteSelectedlist(sear,'siteSelectedlist1')}">
+														<f:selectItems value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist1')}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />							
+													</h:selectManyCheckbox>
+												</div>
+											</h:form>
+										</div>
+									</div>
+								</c:forEach>
+								</h:panelGroup>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+	</ui:define>
+
+	<ui:define name="chartpanel3">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Image Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn3"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn3">
+			<div class="box-content">
+				
+					<div id="myTabContent3" class="tab-content">
+						<div class="tab-pane active" id="info3">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<h:panelGroup id="chartpielist">
+								<c:forEach items="#{comparesearches.searches}" var="sear" varStatus="status">
+									<div>
+										<div id="colo5" style="float: left; width: 400px">
+											<div id="chartpie3_#{sear.id}" style="width: 300px; height: 250px"></div>
+											<br />
+											<p id="showInteractive3">value</p>
+										</div>
+										<div id="colo6" style="float: left;">
+											<div id="listofsite3" >
+												<h:form ajaxSubmit="true">
+													<div style="height: 50px;">
+														<h:commandButton value="Refine Search">
+															<f:ajax execute="@form" render="@form :out2img" listener="#{comparesearches.refineImgSearch}" />
+			    										</h:commandButton>
+			    									</div>
+			    									<div style="height: 250px; width: auto; overflow: auto;">
+														<h:selectManyCheckbox layout="pageDirection" value="#{comparesearches.getSiteSelectedlist(sear,'siteSelectedlist3')}">
+															<f:selectItems value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist3')}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+														</h:selectManyCheckbox>
+													</div>
+												</h:form>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</h:panelGroup>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</ui:define>
+
+
+	<ui:define name="storyboard">
+		
+	</ui:define>
+	
+	<ui:define name="piechartdata">
+		<script>
+			
+		</script>
+		<h:panelGroup id="contextmenuscript">
+		<script>
+				
+				$("#listofsite1").contextmenu({
+				    delegate: ".hasmenu",
+				    menu: [
+				        {title: "Add to...", children: [ 
+							<h:outputText value="#{searchall.contextmenuchild}" escape="false" />    				        
+				            
+				            ]}
+				        ],
+				    select: function(event, ui) {
+				    	if (ui.cmd!='')
+				    		addToSiteSetting(ui.cmd,ui.target.text());
+				        // alert("select " + ui.cmd + " on " + ui.target.text());
+				    }
+				});
+				$("#listofsite1W").contextmenu({
+				    delegate: ".hasmenu",
+				    menu: [
+				        {title: "Add to...", children: [
+							<h:outputText value="#{searchall.contextmenuchild}" escape="false" />
+				            ]}
+				        ],
+				    select: function(event, ui) {
+					    if (ui.cmd!='')
+				    		addToSiteSetting(ui.cmd,ui.target.text());
+				    }
+				});
+			 </script>
+		</h:panelGroup>
+		<h:panelGroup id="out2web"> 
+			<script>
+				<c:forEach items="#{comparesearches.searches}" var="sear">
+					<h:outputText value="#{comparesearches.getSearchDataPie(sear,'searchDataPie1')}" escape="false" />
+				</c:forEach>
+				
+				<h:outputText value="#{comparesearches.searchLangDataPie1}" escape="false" />
+				<h:outputText value="#{comparesearches.searchDataBar1}" escape="false" />
+				<h:outputText value="#{comparesearches.searchWeightedDataPie1}" escape="false" />
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable1').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );								
+				/* ]]> */
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				//tabs
+				$('#myCotextTab a:first').tab('show');
+				$('#myCotextTab a').click(function (e) {
+				  e.preventDefault();
+				  $(this).tab('show');
+				});
+				
+				/* $('.datatable5').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} ); */
+				/* ]]> */
+			</script>
+		</h:panelGroup>
+		<h:panelGroup id="out2img">	
+			<script>
+				<c:forEach items="#{comparesearches.searches}" var="sear">
+					<h:outputText value="#{comparesearches.getSearchDataPie(sear,'searchDataPie3')}" escape="false" />
+				</c:forEach>
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable3').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );									
+				/* ]]> */
+			</script>	
+		</h:panelGroup>
+		<h:panelGroup id="out2">
+			
+		</h:panelGroup>
+		<h:panelGroup id="out2video">			
+			<script>
+				<c:forEach items="#{comparesearches.searches}" var="sear">
+					<h:outputText value="#{comparesearches.getSearchDataPie(sear,'searchDataPie2')}" escape="false" />
+				</c:forEach>
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable2').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );									
+				/* ]]> */
+			</script>
+		</h:panelGroup>
+		<h:panelGroup id="scriptstoryboad">
+		<script type="text/javascript">
+			/* <![CDATA[ */
+            function sortatest(data) {
+				if (data.status === 'success') {
+					$( ".column" ).sortable("refresh");
+					$( ".portlet" )
+				      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" );
+			      	$( ".portlet-header" )
+				      .addClass( "ui-widget-header ui-corner-all" );
+			        $( ".portlet-header" ).prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+				}
+			}
+  		    /* ]]> */
+   		</script>
+		</h:panelGroup>
+		<script>
+			
+			function openOpenForm(){
+				$(".openform").toggle();
+			}
+			function openAddStoryButton(){
+				$(".addstorybutton").toggle();
+			}
+		</script>
+		<script>
+		/* <![CDATA[ */
+		// TO DELETE
+		$(".btntest").click(function (e) {
+		    e.preventDefault();
+		    var text = $("<div class=\"column\"><div class=\"portlet\"><div class=\"portlet-header\">testo</div><div class=\"portlet-content\">Lorem</div></div></div>").val();
+		    // $( "#storybox" ).append("<p>maaaa</p>");
+		    $( "#storybox" ).append("<div class=\"portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\"><div class=\"portlet-header ui-widget-header ui-corner-all\"><span class=\"ui-icon ui-icon-minusthick portlet-toggle\"></span>testo</div><div class=\"portlet-content\">ciao</div></div>");
+		    // alert("aaa");
+		    $( ".column" ).sortable('refresh');
+		});
+		/* ]]> */
+		</script>
+	</ui:define>
+	<ui:define name="modal">
+
+	</ui:define>
+</ui:composition>
+</html>

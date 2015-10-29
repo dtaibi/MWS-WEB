@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+	<html xmlns="http://www.w3.org/1999/xhtml"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:c="http://java.sun.com/jsp/jstl/core"
+		xmlns:composite="http://java.sun.com/jsf/composite">
+
+		<composite:interface>
+			<composite:attribute name="value" required="true"/>
+			<composite:attribute name="type" required="true"/>
+		</composite:interface>
+
+		<composite:implementation>
+			<c:choose>
+	            <c:when test="#{cc.attrs.type == 'Web'}" >
+	                <a target="_blank" href="#{cc.attrs.value.url}"><h:outputText value="#{cc.attrs.value.title}" /></a><br />
+					<h:outputText value="#{cc.attrs.value.description}" escape="false" />
+	            </c:when>
+	            <c:when test="#{cc.attrs.type == 'Video'}" >
+	                <a target="_blank" href="#{cc.attrs.value.url}"><h:outputText value="#{cc.attrs.value.title}" /></a><br />
+					<h:graphicImage url="#{cc.attrs.value.thumbnail.mediaUrl}" width="#{cc.attrs.value.thumbnail.width}" height="#{cc.attrs.value.thumbnail.height}" />
+					<h:outputText value="#{cc.attrs.value.runtime}" escape="false" />
+	            </c:when>
+	            <c:when test="#{cc.attrs.type == 'Image'}" >
+	                <a target="_blank" href="#{cc.attrs.value.url}"><h:outputText value="#{cc.attrs.value.title}" /></a><br />
+					<h:graphicImage url="#{cc.attrs.value.url}" width="100" />
+	            </c:when>
+	            <c:otherwise>
+	                
+	            </c:otherwise>
+	        </c:choose>
+				
+		</composite:implementation>
+
+</html>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROCESS model-entity="JSFProcess">
+ <PROCESS-ITEM NAME="rules:#pages#greeting.xhtml"
+  PATH="/pages/greeting.xhtml" SHAPE="240,33,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#pages#inputname.xhtml"
+  PATH="/pages/inputname.xhtml" SHAPE="32,16,50,41" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#pages#inputname.xhtml:0" NAME="item"
+   PATH="/pages/inputname.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="greeting::#pages#greeting.xhtml"
+    NAME="output" PATH="/pages/greeting.xhtml"
+    TARGET="rules:#pages#greeting.xhtml" TITLE="greeting" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="basicSearch::#pages#basicSearch.xhtml.OK"
+    NAME="output1" PATH="/pages/basicSearch.xhtml.OK"
+    TARGET="rules:#pages#basicSearch.xhtml.OK" TITLE="basicSearch" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#pages#basicSearch.xhtml.OK"
+  PATH="/pages/basicSearch.xhtml.OK" SHAPE="252,102,0,0"
+  model-entity="JSFProcessGroup" persistent="true"/>
+</PROCESS>

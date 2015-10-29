@@ -1,0 +1,320 @@
+<ui:define name="cotextpanel">
+		<ui:repeat value="#{comparesearches.userSearches}" var="search" varStatus="status">
+		<h:panelGroup rendered="#{comparesearches.user.utente.role != 'student'}">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Co-text Results: Table Concordancing
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<h:panelGroup id="outcotext">
+		<div class="box-content">
+			<div class="box-content">
+				<ul class="nav nav-tabs" id="myCotextTab">
+					<ui:repeat value="#{search.searchterms}" var="result" varStatus="status">
+						<li class="#{status.first?'active':''}"><h:outputLink value="##{result}"><h:outputText value="#{result}" escape="false" /></h:outputLink></li>
+					</ui:repeat>
+					<li><a href="#multiplecotext">All</a></li>
+				</ul>
+				<div id="myCotextTabContent" class="tab-content">
+					<ui:repeat id="cotext2" value="#{search.searchterms}" var="result" varStatus="status">
+					<div class="#{status.first?'active':''} tab-pane" id="#{result}">
+						Results for <h:outputText value="#{result}" escape="false" />
+						<table style="width:300px" class="table table-striped table-bordered bootstrap-datatable datatable5">
+							<thead>
+								<tr role="row">
+									<th style="float: right;white-space:nowrap;">Left</th>
+	                				<th style="width:1%;white-space:nowrap;"> </th>
+	                				<th style="float: left;white-space:nowrap;">Right</th>
+								</tr>
+							</thead>
+							<tbody>
+								<h:outputText value="#{comparesearches.cotext(result)}" escape="false" />
+							</tbody>
+						</table>
+					
+					</div>
+					</ui:repeat>
+					<div class="tab-pane" id="multiplecotext">
+						Results for All
+						<table class="table table-striped table-bordered bootstrap-datatable datatable5">
+							<thead>
+								<tr role="row">
+									<ui:repeat value="#{search.searchterms}" var="result">
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</ui:repeat>
+								</tr>
+							</thead>
+							<tbody>
+								<h:outputText value="#{comparesearches.multiplecotext()}" escape="false" />
+							</tbody>
+						</table>
+					
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		</h:panelGroup>
+		</h:panelGroup>
+		</ui:repeat>
+	</ui:define>
+
+	<ui:define name="searchpanel">
+	<ui:repeat value="#{comparesearches.userSearches}" var="sear" varStatus="status">
+	
+			
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Search Result
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info">Web</a></li>
+					<li><a href="#custom">Video</a></li>
+					<li><a href="#messages">Image</a></li>
+				</ul>
+				
+					<div id="myTabContent" class="tab-content">
+						<h:panelGroup rendered="#{comparesearches.user.utente.role != 'student'}"><button onclick="openAddStoryButton()" style="float:right;">On/Off Storyboard</button></h:panelGroup>
+						<div class="tab-pane active" id="info">
+				
+				<h:form id="out" ajaxSubmit="true">
+				<!-- h:panelGroup id="out" -->
+				
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable1">
+						<thead>
+							<tr>
+								<th>Results for Web pages</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- ul class="dashboard-list" -->
+							<ui:repeat id="resultstable" value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist1')}"
+								var="result" rendered="#{not empty comparesearches.getSiteAvailablelist(sear,'siteAvailablelist1')}">
+								<tr>
+									<td>
+									
+	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+											<h:outputText value="#{result.description}" escape="false" />		
+											<br />
+											
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{comparesearches.addWebRes(result)}" >
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+											
+											</td>
+								</tr>
+								<!-- li>
+					     				<ez:searchResult value="#{result}"/>
+					  				</li  -->
+							</ui:repeat>
+							<!--  /ul -->
+						</tbody>
+					</table>
+							
+				<!--  /h:panelGroup -->
+			</h:form>
+			
+				</div>
+				
+					<div class="tab-pane" id="custom">
+					<h:panelGroup id="outvideo">
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable2">
+						<thead>
+							<tr>
+								<th>Results for Videos</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat id="resultstable2" value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist2')}" var="result">
+								<tr>
+									<td>
+										<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+										<h:graphicImage url="#{result.thumbnail.mediaUrl}" width="#{result.thumbnail.width}" height="#{result.thumbnail.height}" />
+										<h:outputText value="#{result.runtime}" escape="false" />
+										<br />
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{comparesearches.addVideoRes(result)}" >
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+	            					</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+					
+								
+				</h:panelGroup>
+					</div>
+					<div class="tab-pane" id="messages">
+						<h:panelGroup id="outimages">
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+						<thead>
+							<tr>
+								<th>Results for Images</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat id="resultstable3" value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist3')}" var="result" rendered="#{not empty comparesearches.getSiteAvailablelist(sear,'siteAvailablelist3')}">
+								<tr>
+									<td>
+	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+											<h:graphicImage url="#{result.url}" width="100" />
+											<br />
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{comparesearches.addImgRes(result)}" > 
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+	            					</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</h:panelGroup>
+							
+					</div>
+				</div>
+			</div>
+		</div>
+	</ui:repeat>
+	</ui:define>
+	
+	
+	<ui:define name="chartpanel1">
+		
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Web Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn1" class="icon-chevron-down"></i></a> 
+				<a href="#"	class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn1">
+			<div class="box-content">
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info2">Pie</a></li>
+					<li><a href="#webweighted">Weighted Pie</a></li>
+					<li><a href="#weblang">Domain Pie</a></li>
+					<li><a href="#webbar">Bar</a></li>
+				</ul>
+				
+				<div id="myTabContent2" class="tab-content">
+					
+					<div class="tab-pane active" id="info2">
+							
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<c:forEach value="#{comparesearches.userSearches}" var="sear" varStatus="status">	
+								<div id="colo1" style="float: left; width: 400px">
+									<div id="chartpie1" style="width: 300px; height: 250px"></div>
+									<br />
+									<p id="showInteractive1">value</p>	
+								</div>
+								<div id="colo2" >
+									<div id="listofsite1">
+										<h:form id="checkform1" ajaxSubmit="true">
+										<h:commandButton value="Refine Search" action="#{comparesearches.refineWebSearch('REFINE_PIE')}">
+											<f:ajax execute="@form" render="@form :out2web :checkform1L :checkform1W" />
+    									</h:commandButton>
+    									<div style="float: left; height: 300px; width: 400px; overflow: auto;">
+											<h:selectManyCheckbox layout="pageDirection" value="#{comparesearches.getSiteAvailablelist(sear,'siteSelectedlist1')}">
+												<f:selectItems value="#{comparesearches.getSiteAvailablelist(sear,'siteAvailablelist1')}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />							
+											</h:selectManyCheckbox>
+										</div>
+										</h:form>
+									</div>
+								</div>
+								</c:forEach>
+						</div>
+						<div class="tab-pane" id="webweighted">
+							<h3>
+								<small>Weighted Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo1W" style="float: left; width: 400px">
+									<div id="chartweightedpie1" style="width: 300px; height: 250px"></div>
+									<br />
+									<p id="showInteractive1W">value</p><br />	
+								</div>
+								<div id="colo2W"  style="float: left;">
+									<div id="listofsite1W" >
+										<h:form id="checkform1W" ajaxSubmit="true">
+											<div style="height: 50px;">
+												<h:commandButton value="Refine Search" action="#{comparesearches.refineWebSearch('REFINE_WEIGHTED_PIE')}">
+													<f:ajax execute="@form" render="@form :out2web :checkform1L " />
+		    									</h:commandButton>
+	    									</div>
+	    									<div style="height: 250px; width: auto; overflow: auto;">
+												<h:selectManyCheckbox layout="pageDirection" value="#{comparesearches.siteSelectedlist1}">
+													<f:selectItems value="#{comparesearches.siteAvailablelist1}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+												</h:selectManyCheckbox>
+											</div>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="weblang">
+							<h3>
+								<small>Domain Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo1L" style="float: left; width: 400px">
+									<div id="chartlangpie1" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colo2L" style="float: left; width: 400px">
+									<div id="listofsite1L" style="height: 300px">
+										<h:form id="checkform1L" ajaxSubmit="true">
+										<p id="showInteractive1L">value</p><br />
+										<h:commandButton value="Refine Search" action="#{comparesearches.refineWebSearch('REFINE_DOMAIN_PIE')}">
+											<f:ajax execute="@form" render="@form :out2web :checkform1W " />
+    									</h:commandButton>
+										<h:selectManyCheckbox value="#{comparesearches.siteSelectedDomainlist1}">
+											<f:selectItems value="#{comparesearches.siteAvailableDomainlist1}" var="i" itemLabel="#{i}"  escape="false" />											
+										</h:selectManyCheckbox>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="webbar">
+							<h3>
+								<small>Bar Chart</small>
+							</h3>
+							<div>
+								<div id="colobar1" style="float: left; width: 400px">
+									<div id="chartbar1" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colobar2" style="float: left; width: 400px">
+									<div id="listofsite1" style="height: 300px">
+										<p id="showInteractive1Bar">value</p><br />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+	</ui:define>
+	
+	

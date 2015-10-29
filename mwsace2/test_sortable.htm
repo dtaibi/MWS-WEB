@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Sortable - Portlets</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  <!-- link rel="stylesheet" href="/resources/demos/style.css" -->
+  <style>
+  body {
+    min-width: 520px;
+  }
+  .column {
+    
+    padding-bottom: 100px;
+  }
+  .portlet {
+    margin: 0 1em 1em 0;
+    padding: 0.3em;
+    float: left;
+    width: 170px;
+  }
+  .portlet-header {
+    padding: 0.2em 0.3em;
+    margin-bottom: 0.5em;
+    position: relative;
+  }
+  .portlet-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin-top: -8px;
+  }
+  .portlet-content {
+    padding: 0.4em;
+  }
+  .portlet-placeholder {
+    border: 1px dotted black;
+    margin: 0 1em 1em 0;
+    width: 170px;
+    height: 50px;
+  }
+  </style>
+  <script>
+  $(function() {
+	  var prevEvent = null;
+	  
+    $( ".column" ).sortable({
+      connectWith: ".column",
+      handle: ".portlet-header",
+      cancel: ".portlet-toggle",
+      placeholder: "portlet-placeholder ui-corner-all",
+      update : function (event,ui) {
+				//Have I alredy handled this event?
+		          if(event.timeStamp == prevEvent){
+		              return null;
+		          }
+				
+		          prevEvent = event.timeStamp;
+					var data11="";
+		          $(".column").each(function(){
+		              data11=data11+$(this).attr('id')+':'+$(this).sortable("serialize");
+		              
+		          });
+		          // alert(data11);
+		          
+	    		}
+			    
+    });
+ 
+    $( ".portlet" )
+      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+      .find( ".portlet-header" )
+        .addClass( "ui-widget-header ui-corner-all" )
+        .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+ 
+    $( ".portlet-toggle" ).click(function() {
+      var icon = $( this );
+      icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
+      icon.closest( ".portlet" ).find( ".portlet-content" ).toggle();
+    });
+  });
+  </script>
+<style>
+#wrapper-frame { width: 150px; height: 150px; padding: 0; overflow: hidden; }
+#scaled-frame { width: 1000px; height: 2000px; border: 0px; }
+#scaled-frame {
+    zoom: 0.2;
+    -moz-transform: scale(0.2);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.2);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.2);
+    -webkit-transform-origin: 0 0;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+ #scaled-frame  { zoom: 1;  }
+}
+</style>
+</head>
+<body>
+
+ 
+<!--  div  id="col0">
+ 
+  <div style="float: left">
+    <div >Feeds</div>
+    <div>Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+  <div style="float: left">
+    <div >News</div>
+    <div >Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+</div --> 
+ 
+<div class="column" id="col1">
+ 
+  <div class="portlet" id="widget_hij">
+    <div class="portlet-header">Feeds</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+  <div class="portlet" id="widget_hza">
+    <div class="portlet-header">News</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+
+  <div class="portlet" id="widget_haz">
+    <div class="portlet-header">Titolo Pagina</div>
+    <div class="portlet-content"><div id="wrapper-frame"><iframe id="scaled-frame" src="http://www.repubblica.it/"></iframe></div></div>
+  </div>
+ 
+</div>
+ 
+<!--  div class="column" id="col2">
+ 
+  <div class="portlet" id="widget_aaa">
+    <div class="portlet-header">Shopping</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+</div>
+ 
+<div class="column" id="col3">
+ 
+  <div class="portlet" id="widget_wew">
+    <div class="portlet-header">Links</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+  <div class="portlet" id="widget_aae">
+    <div class="portlet-header">Images</div>
+    <div class="portlet-content">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>
+  </div>
+ 
+</div -->
+ 
+ 
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<ui:composition template="/templates/common_pages_search_work.xhtml">
+	<ui:define name="pageTitle">MWS - General Settings page</ui:define>
+	<ui:define name="pageHeader">General Settings</ui:define>
+
+	<ui:define name="body">
+		<h:form>
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> General settings
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info">Web</a></li>
+					<li><a href="#custom">Video</a></li>
+					<li><a href="#messages">Image</a></li>
+					<li><a href="#languages">Language</a></li>
+					<li><a href="#cotext">Cotext</a></li>
+				</ul>
+				
+					<div id="myTabContent" class="tab-content">
+					
+						<div class="tab-pane active" id="info">
+						
+				
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable1">
+						<thead>
+							<tr>
+								<th>Web Search Settings</th>
+							</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td>
+								<h:selectManyCheckbox value="#{generalSettings.weblistsel}">
+   									<f:selectItems value="#{generalSettings.weblist}" var="item" itemLabel="#{item.value}" itemValue="#{item.id}" />
+   								</h:selectManyCheckbox>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+					
+								
+				
+				
+				</div>
+					<div class="tab-pane" id="custom">
+				
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable2">
+						<thead>
+							<tr>
+								<th>Video Search Settings</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td>
+								<h:selectManyCheckbox value="#{generalSettings.vidlistsel}">
+   									<f:selectItems value="#{generalSettings.vidlist}" var="item" itemLabel="#{item.value}" itemValue="#{item.id}" />
+   								</h:selectManyCheckbox>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+					
+								
+				
+					</div>
+					
+					<div class="tab-pane" id="cotext">
+						
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+						<thead>
+							<tr>
+								<th>Cotext Settings</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td>
+								<h:selectOneMenu value="#{generalSettings.user.utente.cotextrange}">
+   									<f:selectItem itemValue="1" itemLabel="1" />
+   									<f:selectItem itemValue="2" itemLabel="2" />
+   									<f:selectItem itemValue="3" itemLabel="3" />
+   									<f:selectItem itemValue="4" itemLabel="4" />
+   									<f:selectItem itemValue="5" itemLabel="5" />
+   									<f:selectItem itemValue="6" itemLabel="6" />
+   									<f:selectItem itemValue="7" itemLabel="7" />
+   									<f:selectItem itemValue="8" itemLabel="8" />	   							
+								</h:selectOneMenu>
+							</td>
+						</tr>
+						
+						</tbody>
+					</table>
+				
+				
+					</div>
+					
+					<div class="tab-pane" id="messages">
+						
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+						<thead>
+							<tr>
+								<th>Image Search Settings</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td>
+								<h:selectManyCheckbox value="#{generalSettings.imglistsel}">
+   									<f:selectItems value="#{generalSettings.imglist}" var="item" itemLabel="#{item.value}" itemValue="#{item.id}" />
+   								</h:selectManyCheckbox>
+							</td>
+						</tr>
+						
+						</tbody>
+					</table>
+				
+				
+					</div>
+					
+					<div class="tab-pane" id="languages">
+					
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+						<thead>
+							<tr>
+								<th>Language Settings</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+							<td>
+				
+								<h:selectOneRadio value="#{generalSettings.langlistsel}">
+   									<f:selectItems value="#{generalSettings.langlist}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.id}" />
+   								</h:selectOneRadio>
+   								<h:selectOneRadio value="#{generalSettings.loclistsel}">
+   									<f:selectItems value="#{generalSettings.loclist}" var="item2" itemLabel="#{item2.value}" itemValue="#{item2.id}" />
+   								</h:selectOneRadio>
+							</td>
+						</tr>
+						
+						</tbody>
+					</table>
+				
+				
+					</div>
+					
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+					<tr>
+	   					<td>
+							<h:commandButton value="Save Settings" type="submit" action="#{generalSettings.savesettings}" />
+						</td>
+					</tr>
+				</table>
+				
+				</div>
+			</div>
+		</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

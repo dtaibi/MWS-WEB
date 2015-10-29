@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<f:metadata>
+    <f:event type="preRenderView" listener="#{storyboardlist.loadList}"/>
+</f:metadata>
+
+<ui:composition template="/templates/common_pages_search_work.xhtml">
+	<ui:define name="pageTitle">MWS - Storyboard</ui:define>
+	<ui:define name="pageHeader">Storyboard</ui:define>
+
+	<ui:define name="body">
+	<h:panelGroup id="storyboardlist">
+		<div class="box-header well">
+						<h2><i class="icon-info-sign"></i> Storyboard List</h2>
+						<div class="box-icon">
+							<a href="#" class="btn btn-setting btn-round"><i class="icon-cog"></i></a>
+						</div>
+					</div>
+					<div class="box-content">
+						
+		<table class="table table-striped table-bordered bootstrap-datatable datatable">
+			<thead>
+				<tr>
+					<th>Storyboard List</th>
+				</tr>
+			</thead>
+			<tbody>
+				<ui:repeat id="resultstable" value="#{storyboardlist.list}" var="result" rendered="#{not empty storyboardlist.list}">
+					<tr>
+						<td>
+            				<h:outputText value="#{result.nome}" escape="false" />
+						</td>
+						<td>
+							<h:outputText value="#{result.data}" />
+						</td>
+						<td>
+							<p>
+								<h:link value="Edit Storyboard" outcome="storyboardEdit">
+									<f:param name="storyboardId" value="#{result.id}" />
+								</h:link>
+							</p>
+						</td>
+						<td>
+							<p>
+								<h:link value="Play Storyboard" outcome="storyboardPlay">
+									<f:param name="storyboardId" value="#{result.id}" />
+								</h:link>
+							</p>
+						</td>
+						<td>
+							<h:commandButton value="Delete Storyboard" action="#{storyboardlist.delete(result)}" onclick="if (!confirm('Do you really want to remove this storyboard?')) return false">
+								<f:ajax execute="@form" render=":storyboardlist" />
+							</h:commandButton>
+						</td>
+					</tr>
+				</ui:repeat>
+			</tbody>
+			</table>
+			
+			<h:panelGroup rendered="#{storyboardlist.enabled and not empty storyboardlist.studentlist}">
+			<table class="table table-striped table-bordered bootstrap-datatable datatable">
+			<thead>
+				<tr>
+					<th>Students' Storyboard List</th>
+				</tr>
+			</thead>
+			<tbody>
+				<ui:repeat value="#{storyboardlist.studentlist}" var="result" rendered="#{not empty storyboardlist.studentlist}">
+					<tr>
+						<td>
+							<h:outputText value="#{result.utente.username}" escape="false" />
+						</td>
+						<td>
+            				<h:outputText value="#{result.nome}" escape="false" />
+						</td>
+						<td>
+							<h:outputText value="#{result.data}" />
+						</td>
+						<td>
+							<p>
+								<h:link value="Play Storyboard" outcome="storyboardPlay">
+									<f:param name="storyboardId" value="#{result.id}" />
+								</h:link>
+							</p>
+						</td>
+					</tr>
+				</ui:repeat>
+			</tbody>
+			</table>
+			</h:panelGroup>
+			
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				/* $('.datatable').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );	*/								
+				/* ]]> */
+		</script>
+		
+						<div class="clearfix"></div>
+					</div>
+					</h:panelGroup>
+	</ui:define>
+</ui:composition>
+</html>

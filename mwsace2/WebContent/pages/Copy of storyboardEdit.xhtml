@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+
+
+<ui:composition template="/templates/common_pages_story_play.xhtml">
+	<ui:define name="pageTitle">MWS - Play Storyboard</ui:define>
+	<ui:define name="pageHeader">Edit Storyboard</ui:define>
+
+
+	<ui:define name="body">
+
+		<div class="box-header well">
+			<h2>
+				<i class="icon-info-sign"></i> Edit Storyboard 
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-setting btn-round"><i
+					class="icon-cog"></i></a>
+			</div>
+		</div>
+		<div id="contenitore" class="box-content">
+			<div id="slider1_container" style="position: relative; margin: 0 auto; top: 0px; left: 0px; width:1024px; height: 550px; overflow: hidden;">
+        
+        <!-- Slides Container -->
+        <h:panelGroup id="slidelist">
+        <h:form ajaxSubmit="true">
+        <div u="slides" style="cursor: move; position: absolute; left: 0px; top: 0px; width:1000px; height: 550px; overflow: hidden;">
+        	 
+        	 <ui:repeat var="o" value="#{storyboard.itemByPos}" >
+				<div>
+				
+				<div style="position: absolute; width: 100%; left: 60px; padding: 5px; text-align: left;">Title: <h:inputText value="#{o.title}" style="width: 750px;" /></div>
+                	<div style="position: absolute; width: 100%; height: 85%; top: 30px; left: 60px; padding: 5px; text-align: left; line-height: 36px; font-size: 30px; color: #222;">
+                        <h:outputText value="#{o.webcontent}" escape="false" />
+                	
+            	
+            	
+            	
+					<table border="0" width="100%">
+						<tr>
+	    					<td width="80%">
+	    						<h:inputTextarea value="#{o.comment}" style="width: 750px;" /> 
+							</td>
+							<td width="20%">
+									<h:commandButton value="Save" action="#{storyboard.saveComment(o)}">
+		        						<f:ajax execute="@form" render=":sblist :scriptslider" onevent="sortab" />
+		    						</h:commandButton>		    					
+		    				</td>
+	    				</tr>
+    				</table> 
+            	</div>
+            	
+            	
+            	</div>
+   			</ui:repeat>
+   			 
+        </div>
+        </h:form>
+       
+        </h:panelGroup>
+        <!-- Bullet Navigator Skin Begin -->
+        <!-- bullet navigator container -->
+        <!--  div u="navigator" class="jssorb21" style="position: absolute; bottom: 26px; left: 6px;">
+            <bullet navigator item prototype -->
+            <!-- div u="prototype" style="POSITION: absolute; WIDTH: 19px; HEIGHT: 19px; text-align:center; line-height:19px; color:White; font-size:12px;"></div>
+        </div -->
+        <!-- Bullet Navigator Skin End -->
+        <!-- Arrow Left -->
+        <span u="arrowleft" class="jssora21l" style="width: 55px; height: 55px; top: 123px; left: 8px;">
+        </span>
+        <!-- Arrow Right -->
+        <span u="arrowright" class="jssora21r" style="width: 55px; height: 55px; top: 123px; right: 0px">
+        </span>
+        </div>
+			
+			<style>
+
+		textarea {
+    			resize: none;
+		}
+            /* jssor slider bullet navigator skin 21 css */
+            /*
+            .jssorb21 div           (normal)
+            .jssorb21 div:hover     (normal mouseover)
+            .jssorb21 .av           (active)
+            .jssorb21 .av:hover     (active mouseover)
+            .jssorb21 .dn           (mousedown)
+            */
+            .jssorb21 div, .jssorb21 div:hover, .jssorb21 .av
+            {
+                background: url("#{resource['jssor:img/b21.png']}") no-repeat;
+                overflow:hidden;
+                cursor: pointer;
+            }
+            .jssorb21 div { background-position: -5px -5px; }
+            .jssorb21 div:hover, .jssorb21 .av:hover { background-position: -35px -5px; }
+            .jssorb21 .av { background-position: -65px -5px; }
+            .jssorb21 .dn, .jssorb21 .dn:hover { background-position: -95px -5px; }
+        </style>
+         <!-- Arrow Navigator Skin Begin -->
+        <style>
+            /* jssor slider arrow navigator skin 21 css */
+            /*
+            .jssora21l              (normal)
+            .jssora21r              (normal)
+            .jssora21l:hover        (normal mouseover)
+            .jssora21r:hover        (normal mouseover)
+            .jssora21ldn            (mousedown)
+            .jssora21rdn            (mousedown)
+            */
+            .jssora21l, .jssora21r, .jssora21ldn, .jssora21rdn
+            {
+            	position: absolute;
+            	cursor: pointer;
+            	display: block;
+                background: url("#{resource['jssor:img/a07.png']}") center center no-repeat;
+                overflow: hidden;
+            }
+            .jssora21l { background-position: -3px -33px; }
+            .jssora21r { background-position: -63px -33px; }
+            .jssora21l:hover { background-position: -123px -33px; }
+            .jssora21r:hover { background-position: -183px -33px; }
+            .jssora21ldn { background-position: -243px -33px; }
+            .jssora21rdn { background-position: -303px -33px; }
+        </style>
+			
+			<div class="clearfix"></div>
+		</div>
+		
+	</ui:define>
+	
+	<ui:define name="storyboard">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Storyboard
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="tltn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minstoryboardbtn">
+			<div class="box-content" style="height: 225px" >
+ 				<h:panelGroup id="sblist">
+					<div class="column" id="col1">
+		 				<ui:repeat value="#{storyboard.storyboardlist}" var="result" rendered="#{not empty storyboard.storyboardlist}">
+							<div class="portlet" id="widget_#{result.pos}">
+						    	<div class="portlet-header" style="height: 50px;overflow:hidden;">
+						    	<table>
+						    	<tr>
+						    	<td>
+						    	<h:outputText value="#{result.title}" escape="false" />
+						    	</td><td>
+						    		<h:panelGroup>
+									<h:form ajaxsubmit="true">
+								    	<h:commandButton value="x" action="#{storyboard.RemoveWebRes(result)}" onclick="if (!confirm('Do you really want to remove this item?')) return false">
+											
+										</h:commandButton>
+									</h:form>
+									</h:panelGroup>
+								</td>
+								</tr>
+								</table>
+						    	</div>
+						    	<div class="portlet-content"><div id="wrapper-frame"><h:outputText value="#{result.webcontent}" escape="false" /></div></div>
+						  	</div>
+						</ui:repeat>
+ 					</div>
+ 					
+				</h:panelGroup>
+				</div>
+				<div style="clear: both"></div>
+ 					<h:graphicImage value="#{resource['theme:img/save.png']}" alt="savestoryboardbutton" onclick="openSaveForm()" />
+ 					<h:form id="saveStoryBoard" ajaxSubmit="true" styleClass="saveform">
+				<table border="0">
+					<tr>
+						<td>
+							<h:outputText value="#{msgs.storyboard}" />
+						</td>
+    					<td>
+    						<h:inputText value="#{storyboard.storyboardl.content.nome}" /> 
+						</td>
+						<td>
+							<h:commandButton value="Save Storyboard">
+	        					<f:ajax listener="#{storyboard.saveStoryboard}" execute="@form" render="@form" />
+	    					</h:commandButton>
+	    				</td>
+	    				<td>
+	    					
+	    				</td>
+    				</tr>
+    			</table>
+			</h:form>
+		</div>
+		
+	</ui:define>
+	
+	
+	
+	
+	<ui:define name="scriptdata">
+	
+	<script>
+					/* <![CDATA[ */
+   				function sortab(data) {
+   				    if (data.status === 'success') {
+   				    	var prevEvent = null;
+   					  
+   				     $( ".column" ).sortable({
+   				       connectWith: ".column",
+   				       handle: ".portlet-header",
+   				       cancel: ".portlet-toggle",
+   				       placeholder: "portlet-placeholder ui-corner-all",
+   				       update : function (event,ui) {
+   				 				//Have I alredy handled this event?
+   				 		          if(event.timeStamp == prevEvent){
+   				 		              return null;
+   				 		          }
+   				 				
+   				 		          prevEvent = event.timeStamp;
+   				 					var data11="";
+   				 		          $(".column").each(function(){
+   				 		              data11=data11+$(this).attr('id')+':'+$(this).sortable("serialize");
+   				 		              
+   				 		          });
+   				 		      orderList(data11);
+   				 		          
+   				 	    		}
+   				 			    
+   				     });
+   				    	
+   				    	$( ".portlet" )
+ 					      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" );
+					      
+ 					      $( ".portlet-header" )
+ 					        .addClass( "ui-widget-header ui-corner-all" );
+					        
+ 					     $( ".portlet-header" ).prepend( "<span class=\"ui-icon ui-icon-minusthick portlet-toggle\"></span>");
+ 					 
+ 					       
+   				    }
+   				}
+   				/* ]]> */
+   				</script>
+   				<h:panelGroup>
+			<h:form ajaxSubmit="true">
+    			<a4j:jsFunction name="orderList"  action="#{storyboard.reorderList}" render="slidelist scriptslider sblist">
+    				<a4j:param name="data" assignTo="#{storyboard.storydata}" />
+    			</a4j:jsFunction>
+ 			</h:form>
+ 			</h:panelGroup>
+		<script>
+			function openSaveForm(){
+				$(".saveform").toggle();
+			}
+			function openOpenForm(){
+				$(".openform").toggle();
+			}
+		</script>	
+	
+	<h:panelGroup id="scriptslider">
+		<script>
+        // jQuery(document).ready(function ($) {
+
+            var options = {
+                $FillMode: 2,                                       //[Optional] The way to fill image in slide, 0 stretch, 1 contain (keep aspect ratio and put all inside slide), 2 cover (keep aspect ratio and cover whole slide), 4 actuall size, default value is 0
+                $PauseOnHover: 3,                                   //[Optional] Whether to pause when mouse over if a slider is auto playing, 0 no pause, 1 pause for desktop, 2 pause for touch device, 3 pause for desktop and touch device, default value is 3
+
+                $ArrowKeyNavigation: false,   			            //[Optional] Allows keyboard (arrow key) navigation or not, default value is false
+                $SlideEasing: $JssorEasing$.$EaseOutQuart,          //[Optional] Specifies easing for right to left animation, default value is $JssorEasing$.$EaseOutQuad
+                $SlideDuration: 1200,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+                $MinDragOffsetToSlide: 20,                          //[Optional] Minimum drag offset to trigger slide , default value is 20
+                //$SlideWidth: 600,                                 //[Optional] Width of every slide in pixels, default value is width of 'slides' container
+                //$SlideHeight: 300,                                //[Optional] Height of every slide in pixels, default value is height of 'slides' container
+                $SlideSpacing: 0, 					                //[Optional] Space between each slide in pixels, default value is 0
+                $DisplayPieces: 1,                                  //[Optional] Number of pieces to display (the slideshow would be disabled if the value is set to greater than 1), the default value is 1
+                $ParkingPosition: 0,                                //[Optional] The offset position to park slide (this options applys only when slideshow disabled), default value is 0.
+                $UISearchMode: 1,                                   //[Optional] The way (0 parellel, 1 recursive, default value is 1) to search UI components (slides container, loading screen, navigator container, arrow navigator container, thumbnail navigator container etc).
+                $PlayOrientation: 1,                                //[Optional] Orientation to play slide (for auto play, navigation), 1 horizental, 2 vertical, default value is 1
+                $DragOrientation: 0,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
+
+                
+                
+                $ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
+                    $Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
+                    $ChanceToShow: 1,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+                    $AutoCenter: 2,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+                    $Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
+                }
+            };
+            
+
+            var jssor_slider1 = new $JssorSlider$("slider1_container", options);
+
+            //responsive code begin
+            //you can remove responsive code if you don't want the slider scales while window resizes
+            function ScaleSlider() {
+                var bodyWidth = document.getElementById('contenitore').offsetWidth ; // document.body.clientWidth;
+                if (bodyWidth)
+                    jssor_slider1.$SetScaleWidth(Math.min(bodyWidth-100, 1200));
+                else
+                    window.setTimeout(ScaleSlider, 30);
+            }
+
+            ScaleSlider();
+
+            if (!navigator.userAgent.match(/(iPhone|iPod|iPad|BlackBerry|IEMobile)/)) {
+                $(window).bind('resize', ScaleSlider);
+            }
+            //responsive code end
+        // });
+    </script>
+    </h:panelGroup>
+	</ui:define>
+</ui:composition>
+</html>

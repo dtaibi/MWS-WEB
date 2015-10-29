@@ -1,0 +1,810 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<f:metadata>
+    <f:viewParam name="resultId" value="#{searchall.resultId}" />
+    <f:event type="preRenderView" listener="#{searchall.loadSearch(1)}"/>
+</f:metadata>
+
+<ui:composition template="/templates/common_pages.xhtml">
+	<ui:define name="pageTitle">MWS - Basic Search page</ui:define>
+	<ui:define name="pageHeader">Basic Search</ui:define>
+
+	<ui:define name="body">
+		<div style="float:left;">
+		<h:form id="helloForm" ajaxSubmit="true">
+			<ez:basicSearchOption id="searchinput"
+				searchResult="#{searchall.searchResult1}" label="#{msgs.search}"
+				item="#{searchall.searchtype}" list="#{searchall.searchtypelist}"
+				values="#{searchall.searchterms}" extend="#{searchall.extend}"
+				action="#{searchall.searcAll(1)}" submitlabel="Start Search" />
+		</h:form>
+		</div>
+		
+		<h:panelGroup id="ssettingss">
+		<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px;" rendered="#{not empty searchall.searchsettings}">
+			<p><h:outputText value="#{searchall.searchsettings}" escape="false"/></p>
+		</h:panelGroup>
+		</h:panelGroup>
+		<div style="float:left; clear: both">
+		<h:graphicImage value="#{resource['theme:img/save.png']}" alt="savebutton" onclick="openSaveForm()" />
+		<h:form id="saveForm" ajaxSubmit="true" styleClass="saveform">
+			<table border="0">
+			<tr>
+			<td>
+				<h:outputText value="#{msgs.save}" />
+			</td>
+    		<td>
+    			<h:inputText value="#{searchall.name}"/> 
+			</td>
+			<td>
+				<h:commandButton value="Save Search">
+	        		<f:ajax listener="#{searchall.saveSearch}" execute="@form" render="@form" />
+	    		</h:commandButton>
+	    	</td>
+	    	<td>	
+	    		<h:commandButton value="Save as New Search"> <!--  rendered="{searchall.nameEmpty}"> -->
+	        		<f:ajax listener="#{searchall.saveNewSearch}" execute="@form" render="@form" />
+	    		</h:commandButton>
+    		</td>
+    		</tr>
+    		</table>
+		</h:form>
+		</div>
+		<a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}" alt="ai" />
+            </f:facet>
+        </a4j:status>
+	</ui:define>
+
+	<ui:define name="cotextpanel">
+		<h:panelGroup rendered="#{searchall.user.utente.role != 'student'}">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Co-text Results: Table Concordancing
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<h:panelGroup id="outcotext">
+		<div class="box-content">
+			<div class="box-content">
+				<ul class="nav nav-tabs" id="myCotextTab">
+					<ui:repeat value="#{searchall.searchterms}" var="result" varStatus="status">
+						<li class="#{status.first?'active':''}"><h:outputLink value="##{result}"><h:outputText value="#{result}" escape="false" /></h:outputLink></li>
+					</ui:repeat>
+					<li><a href="#multiplecotext">All</a></li>
+				</ul>
+				<div id="myCotextTabContent" class="tab-content">
+					<ui:repeat id="cotext2" value="#{searchall.searchterms}" var="result" varStatus="status">
+					<div class="#{status.first?'active':''} tab-pane" id="#{result}">
+						Results for <h:outputText value="#{result}" escape="false" />
+						<table style="width:300px" class="table table-striped table-bordered bootstrap-datatable datatable5">
+							<thead>
+								<tr role="row">
+									<th style="float: right;white-space:nowrap;">Left</th>
+	                				<th style="width:1%;white-space:nowrap;"> </th>
+	                				<th style="float: left;white-space:nowrap;">Right</th>
+								</tr>
+							</thead>
+							<tbody>
+								<h:outputText value="#{searchall.cotext(result)}" escape="false" />
+							</tbody>
+						</table>
+					
+					</div>
+					</ui:repeat>
+					<div class="tab-pane" id="multiplecotext">
+						Results for All
+						<table class="table table-striped table-bordered bootstrap-datatable datatable5">
+							<thead>
+								<tr role="row">
+									<ui:repeat value="#{searchall.searchterms}" var="result">
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</ui:repeat>
+								</tr>
+							</thead>
+							<tbody>
+								<h:outputText value="#{searchall.multiplecotext()}" escape="false" />
+							</tbody>
+						</table>
+					
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		</h:panelGroup>
+		</h:panelGroup>
+	</ui:define>
+
+	<ui:define name="searchpanel">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Search Result
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info">Web</a></li>
+					<li><a href="#custom">Video</a></li>
+					<li><a href="#messages">Image</a></li>
+				</ul>
+				
+					<div id="myTabContent" class="tab-content">
+						<h:panelGroup rendered="#{searchall.user.utente.role != 'student'}"><button onclick="openAddStoryButton()" style="float:right;">On/Off Storyboard</button></h:panelGroup>
+						<div class="tab-pane active" id="info">
+				
+				<h:form id="out" ajaxSubmit="true">
+				<!-- h:panelGroup id="out" -->
+				
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable1">
+						<thead>
+							<tr>
+								<th>Results for Web pages</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- ul class="dashboard-list" -->
+							<ui:repeat id="resultstable" value="#{searchall.searchResult1}"
+								var="result" rendered="#{not empty searchall.searchResult1}">
+								<tr>
+									<td>
+									
+	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+											<h:outputText value="#{result.description}" escape="false" />		
+											<br />
+											
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{searchall.addWebRes(result)}" >
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+											
+											</td>
+								</tr>
+								<!-- li>
+					     				<ez:searchResult value="#{result}"/>
+					  				</li  -->
+							</ui:repeat>
+							<!--  /ul -->
+						</tbody>
+					</table>
+					<script>
+					/* <![CDATA[ */
+   				function sortab(data) {
+   				    if (data.status === 'success') {
+   				    	var prevEvent = null;
+   					  
+   				     $( ".column" ).sortable({
+   				       connectWith: ".column",
+   				       handle: ".portlet-header",
+   				       cancel: ".portlet-toggle",
+   				       placeholder: "portlet-placeholder ui-corner-all",
+   				       update : function (event,ui) {
+   				 				//Have I alredy handled this event?
+   				 		          if(event.timeStamp == prevEvent){
+   				 		              return null;
+   				 		          }
+   				 				
+   				 		          prevEvent = event.timeStamp;
+   				 					var data11="";
+   				 		          $(".column").each(function(){
+   				 		              data11=data11+$(this).attr('id')+':'+$(this).sortable("serialize");
+   				 		              
+   				 		          });
+   				 		      orderList(data11);
+   				 		          
+   				 	    		}
+   				 			    
+   				     });
+   				    	
+   				    	$( ".portlet" )
+ 					      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" );
+					      
+ 					      $( ".portlet-header" )
+ 					        .addClass( "ui-widget-header ui-corner-all" );
+					        
+ 					     $( ".portlet-header" ).prepend( "<span class=\"ui-icon ui-icon-minusthick portlet-toggle\"></span>");
+ 					 
+ 					       
+   				    }
+   				}
+   				/* ]]> */
+   				</script>
+							
+				<!--  /h:panelGroup -->
+			</h:form>
+			<h:form> 
+    			<a4j:jsFunction name="orderList"  action="#{searchall.reorderList}">
+    				<a4j:param name="data" assignTo="#{searchall.storydata}" />
+    			</a4j:jsFunction>
+ 			</h:form>
+ 			<h:form> 
+    			<a4j:jsFunction name="addToSiteSetting"  action="#{searchall.addToSiteSetting}" render="contextmenuscript">
+    				<a4j:param name="data1" assignTo="#{searchall.siteSetId}" />
+    				<a4j:param name="data2" assignTo="#{searchall.siteText}" />
+    			</a4j:jsFunction>
+ 			</h:form>
+				</div>
+				
+					<div class="tab-pane" id="custom">
+					<h:panelGroup id="outvideo">
+					<table
+						class="table table-striped table-bordered bootstrap-datatable datatable2">
+						<thead>
+							<tr>
+								<th>Results for Videos</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat id="resultstable2" value="#{searchall.searchResult2}"
+								var="result" rendered="#{not empty searchall.searchResult2}">
+								<tr>
+									<td>
+										<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+										<h:graphicImage url="#{result.thumbnail.mediaUrl}" width="#{result.thumbnail.width}" height="#{result.thumbnail.height}" />
+										<h:outputText value="#{result.runtime}" escape="false" />
+										<br />
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{searchall.addVideoRes(result)}" >
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+	            					</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+					
+								
+				</h:panelGroup>
+					</div>
+					<div class="tab-pane" id="messages">
+						<h:panelGroup id="outimages">
+					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
+						<thead>
+							<tr>
+								<th>Results for Images</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat id="resultstable3" value="#{searchall.searchResult3}" var="result" rendered="#{not empty searchall.searchResult3}">
+								<tr>
+									<td>
+	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+											<h:graphicImage url="#{result.url}" width="100" />
+											<br />
+												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{searchall.addImgRes(result)}" > 
+													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+												</h:commandButton>
+	            					</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</h:panelGroup>
+							
+					</div>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="chartpanel1">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Web Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn1" class="icon-chevron-down"></i></a> 
+				<a href="#"	class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn1">
+			<div class="box-content">
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info2">Pie</a></li>
+					<li><a href="#webweighted">Weighted Pie</a></li>
+					<li><a href="#weblang">Domain Pie</a></li>
+					<li><a href="#webbar">Bar</a></li>
+				</ul>
+				
+				<div id="myTabContent2" class="tab-content">
+				<div class="tab-pane active" id="info2">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+								
+								<div id="colo1" style="float: left; width: 400px">
+									<div id="chartpie1" style="width: 300px; height: 250px"></div>
+									<br />
+									<p id="showInteractive1">value</p>	
+								</div>
+								<div id="colo2" >
+									<div id="listofsite1">
+										<h:form id="checkform1" ajaxSubmit="true">
+										<h:commandButton value="Refine Search" action="#{searchall.refineWebSearch('REFINE_PIE')}">
+											<f:ajax execute="@form" render="@form :out :out2web :checkform1L :checkform1W" />
+    									</h:commandButton>
+    									<div style="float: left; height: 300px; width: 400px; overflow: auto;">
+											<h:selectManyCheckbox layout="pageDirection" value="#{searchall.siteSelectedlist1}">
+												<f:selectItems value="#{searchall.siteAvailablelist1}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />							
+											</h:selectManyCheckbox>
+										</div>
+										</h:form>
+									</div>
+								</div>
+								
+								<script>
+								/* <![CDATA[ */
+   								/* function convertPie() {
+   	   								alert('convert Pie');
+								} */
+   								/* ]]> */
+   								</script>
+						</div>
+						<div class="tab-pane" id="webweighted">
+							<h3>
+								<small>Weighted Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo1W" style="float: left; width: 400px">
+									<div id="chartweightedpie1" style="width: 300px; height: 250px"></div>
+									<br />
+									<p id="showInteractive1W">value</p><br />	
+								</div>
+								<div id="colo2W"  style="float: left;">
+									<div id="listofsite1W" >
+										<h:form id="checkform1W" ajaxSubmit="true">
+											<div style="height: 50px;">
+												<h:commandButton value="Refine Search" action="#{searchall.refineWebSearch('REFINE_WEIGHTED_PIE')}">
+													<f:ajax execute="@form" render="@form :out :out2web :checkform1L :checkform1" />
+		    									</h:commandButton>
+	    									</div>
+	    									<div style="height: 250px; width: auto; overflow: auto;">
+												<h:selectManyCheckbox layout="pageDirection" value="#{searchall.siteSelectedlist1}">
+													<f:selectItems value="#{searchall.siteAvailablelist1}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+												</h:selectManyCheckbox>
+											</div>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="weblang">
+							<h3>
+								<small>Domain Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo1L" style="float: left; width: 400px">
+									<div id="chartlangpie1" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colo2L" style="float: left; width: 400px">
+									<div id="listofsite1L" style="height: 300px">
+										<h:form id="checkform1L" ajaxSubmit="true">
+										<p id="showInteractive1L">value</p><br />
+										<h:commandButton value="Refine Search" action="#{searchall.refineWebSearch('REFINE_DOMAIN_PIE')}">
+											<f:ajax execute="@form" render="@form :out :out2web :checkform1W :checkform1" />
+    									</h:commandButton>
+										<h:selectManyCheckbox value="#{searchall.siteSelectedDomainlist1}">
+											<f:selectItems value="#{searchall.siteAvailableDomainlist1}" var="i" itemLabel="#{i}"  escape="false" />											
+										</h:selectManyCheckbox>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane" id="webbar">
+							<h3>
+								<small>Bar Chart</small>
+							</h3>
+							<div>
+								<div id="colobar1" style="float: left; width: 400px">
+									<div id="chartbar1" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colobar2" style="float: left; width: 400px">
+									<div id="listofsite1" style="height: 300px">
+										<p id="showInteractive1Bar">value</p><br />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	</ui:define>
+	<ui:define name="chartpanel2">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Video Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn2"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn2">
+			<div class="box-content">
+				
+					<div id="myTabContent2" class="tab-content">
+						<div class="tab-pane active" id="info2">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo3" style="float: left; width: 400px">
+									<div id="chartpie2" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colo4" style="float: left; width: 400px">
+									<div id="listofsite2" style="height: 300px">
+										<h:form id="checkform2" ajaxSubmit="true">
+										<p id="showInteractive2">value</p><br />
+										<h:commandButton value="Refine Search">
+											<f:ajax execute="@form" render="@form :outvideo :out2video" listener="#{searchall.refineVideoSearch}" />
+    									</h:commandButton>
+										<h:selectManyCheckbox layout="pageDirection" value="#{searchall.siteSelectedlist2}">
+											<f:selectItems value="#{searchall.siteAvailablelist2}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+										</h:selectManyCheckbox>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="chartpanel3">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Image Chart Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn3"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn3">
+			<div class="box-content">
+				
+					<div id="myTabContent3" class="tab-content">
+						<div class="tab-pane active" id="info3">
+							<h3>
+								<small>Pie Chart</small>
+							</h3>
+							<div>
+								<div id="colo5" style="float: left; width: 400px">
+									<div id="chartpie3" style="width: 300px; height: 250px"></div>	
+								</div>
+								<div id="colo6" style="float: left; width: 400px">
+									<div id="listofsite3" style="height: 300px">
+										<h:form id="checkform3" ajaxSubmit="true">
+										<p id="showInteractive3">value</p><br />
+										<h:commandButton value="Refine Search">
+											<f:ajax execute="@form" render="@form :outimages :out2img" listener="#{searchall.refineImgSearch}" />
+    									</h:commandButton>
+										<h:selectManyCheckbox layout="pageDirection" value="#{searchall.siteSelectedlist3}">
+											<f:selectItems value="#{searchall.siteAvailablelist3}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
+										</h:selectManyCheckbox>
+										</h:form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="storyboard">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Storyboard
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="tltn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minstoryboardbtn">
+			<div class="box-content" style="height: 225px" >
+ 				<h:panelGroup id="sblist">
+					<div class="column" id="col1">
+		 				<ui:repeat value="#{searchall.storyboardlist}" var="result" rendered="#{not empty searchall.storyboardlist}">
+							<div class="portlet" id="widget_#{result.pos}">
+						    	<div class="portlet-header" style="height: 50px;overflow:hidden;">
+						    	<table>
+						    	<tr>
+						    	<td>
+						    	<h:outputText value="#{result.title}" escape="false" />
+						    	</td><td>
+						    	<h:commandButton value="x" action="#{searchall.RemoveWebRes(result)}" onclick="if (!confirm('Do you really want to remove this item?')) return false">
+									<f:ajax execute="@form" render=":sblist" onevent="sortab" />
+								</h:commandButton>
+								</td>
+								</tr>
+								</table>
+						    	</div>
+						    	<div class="portlet-content"><div id="wrapper-frame"><h:outputText value="#{result.webcontent}" escape="false" /></div></div>
+						  	</div>
+						</ui:repeat>
+ 					</div>
+ 					
+				</h:panelGroup>
+				</div>
+				<div style="clear: both"></div>
+ 					<h:graphicImage value="#{resource['theme:img/save.png']}" alt="savestoryboardbutton" onclick="openSaveForm()" />
+ 					<h:form id="saveStoryBoard" ajaxSubmit="true" styleClass="saveform">
+				<table border="0">
+					<tr>
+						<td>
+							<h:outputText value="#{msgs.storyboard}" />
+						</td>
+    					<td>
+    						<h:inputText value="#{searchall.storybname}" /> 
+						</td>
+						<td>
+							<h:commandButton value="Save Storyboard">
+	        					<f:ajax listener="#{searchall.saveStoryboard}" execute="@form" render="@form" />
+	    					</h:commandButton>
+	    				</td>
+	    				<td>
+	    					<h:commandButton value="Save as New Storyboard"> 
+	        					<f:ajax listener="#{searchall.saveNewStoryboard}" execute="@form" render="@form" />
+	    					</h:commandButton>
+	    				</td>
+    				</tr>
+    			</table>
+			</h:form>
+			
+			<h:graphicImage value="#{resource['theme:img/open.png']}" width="24" alt="openstoryboardbutton" onclick="openOpenForm()" />
+ 			<h:form id="oStoryBoard" ajaxSubmit="true" styleClass="openform">
+				<table border="0">
+					<tr>
+						<td>
+							<h:outputText value="#{msgs.ostoryboard}" />
+						</td>
+    					<td>
+    						<h:selectOneMenu value="#{searchall.storyboardsel}">
+   								<f:selectItems value="#{searchall.userStoryboards}" var="c" itemLabel="#{c.nome}" itemValue="#{c.id}" />
+   							</h:selectOneMenu> 
+						</td>
+						<td>
+							<h:commandButton value="Open Storyboard" >
+								<f:ajax execute="@form" render="@form :sblist :saveStoryBoard" listener="#{searchall.openStoryboard}" onevent="sortab" />
+    						</h:commandButton>
+	    				</td>
+    				</tr>
+    			</table>
+			</h:form>				
+			
+		</div>
+	</ui:define>
+	
+	<ui:define name="timelinepanel">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Timeline
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="tltn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="mintimelinebtn">
+			<div class="box-content" style="height: 225px">
+				<div id="timeline" style="width: 50%"></div>
+			</div>
+		</div>
+	</ui:define>
+
+	<ui:define name="piechartdata">
+		<script>
+			var timeline = new VMM.Timeline();
+			timeline.init('{"timeline":{"headline":"Starting","startDate":"2013,01","text":"Starting Point","asset":{"caption":"","credit":"","media":"aaa"},"date":[],"type":"default"}}');
+		</script>
+		<h:panelGroup id="contextmenuscript">
+		<script>
+				
+				$("#listofsite1").contextmenu({
+				    delegate: ".hasmenu",
+				    menu: [
+				        {title: "Add to...", children: [ 
+							<h:outputText value="#{searchall.contextmenuchild}" escape="false" />    				        
+				            
+				            ]}
+				        ],
+				    select: function(event, ui) {
+				    	if (ui.cmd!='')
+				    		addToSiteSetting(ui.cmd,ui.target.text());
+				        // alert("select " + ui.cmd + " on " + ui.target.text());
+				    }
+				});
+				$("#listofsite1W").contextmenu({
+				    delegate: ".hasmenu",
+				    menu: [
+				        {title: "Add to...", children: [
+							<h:outputText value="#{searchall.contextmenuchild}" escape="false" />
+				            ]}
+				        ],
+				    select: function(event, ui) {
+					    if (ui.cmd!='')
+				    		addToSiteSetting(ui.cmd,ui.target.text());
+				    }
+				});
+			 </script>
+		</h:panelGroup>
+		<h:panelGroup id="out2web"> 
+			<script>
+				<h:outputText value="#{searchall.searchDataPie1}" escape="false" />
+				<h:outputText value="#{searchall.searchLangDataPie1}" escape="false" />
+				<h:outputText value="#{searchall.searchDataBar1}" escape="false" />
+				<h:outputText value="#{searchall.searchWeightedDataPie1}" escape="false" />
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable1').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );								
+				/* ]]> */
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				//tabs
+				$('#myCotextTab a:first').tab('show');
+				$('#myCotextTab a').click(function (e) {
+				  e.preventDefault();
+				  $(this).tab('show');
+				});
+				
+				/* $('.datatable5').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} ); */
+				/* ]]> */
+			</script>
+		</h:panelGroup>
+		<h:panelGroup id="out2img">	
+			<script>
+				<h:outputText value="#{searchall.searchDataPie3}" escape="false" />
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable3').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );									
+				/* ]]> */
+			</script>	
+		</h:panelGroup>
+		<h:panelGroup id="out2">
+			<script>
+				<h:outputText value="#{searchall.timeline}" escape="false" />
+			</script>
+		</h:panelGroup>
+		<h:panelGroup id="out2video">			
+			<script>
+				<h:outputText value="#{searchall.searchDataPie2}" escape="false" />
+			</script>
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable2').dataTable({
+					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
+					"sPaginationType": "bootstrap",
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );									
+				/* ]]> */
+			</script>
+		</h:panelGroup>
+		<h:panelGroup id="scriptstoryboad">
+		<script type="text/javascript">
+			/* <![CDATA[ */
+            function sortatest(data) {
+				if (data.status === 'success') {
+					$( ".column" ).sortable("refresh");
+					$( ".portlet" )
+				      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" );
+			      	$( ".portlet-header" )
+				      .addClass( "ui-widget-header ui-corner-all" );
+			        $( ".portlet-header" ).prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+				}
+			}
+  		    /* ]]> */
+   		</script>
+		</h:panelGroup>
+		<script>
+			function openSaveForm(){
+				$(".saveform").toggle();
+			}
+			function openOpenForm(){
+				$(".openform").toggle();
+			}
+			function openAddStoryButton(){
+				$(".addstorybutton").toggle();
+			}
+		</script>
+		<script>
+		/* <![CDATA[ */
+		// TO DELETE
+		$(".btntest").click(function (e) {
+		    e.preventDefault();
+		    var text = $("<div class=\"column\"><div class=\"portlet\"><div class=\"portlet-header\">testo</div><div class=\"portlet-content\">Lorem</div></div></div>").val();
+		    // $( "#storybox" ).append("<p>maaaa</p>");
+		    $( "#storybox" ).append("<div class=\"portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\"><div class=\"portlet-header ui-widget-header ui-corner-all\"><span class=\"ui-icon ui-icon-minusthick portlet-toggle\"></span>testo</div><div class=\"portlet-content\">ciao</div></div>");
+		    // alert("aaa");
+		    $( ".column" ).sortable('refresh');
+		});
+		/* ]]> */
+		</script>
+	</ui:define>
+	<ui:define name="modal">
+		
+		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>Language and Localization Settings</h3>
+			</div>
+			<div class="modal-body">
+				<h:form id="modallang" ajaxSubmit="true">
+				<h:selectOneRadio value="#{searchall.langlistsel}">
+   					<f:selectItems value="#{searchall.langlist}" var="item1" itemLabel="#{item1.value}" itemValue="#{item1.id}" />
+   				</h:selectOneRadio>
+   				<h:selectOneRadio value="#{searchall.loclistsel}">
+   					<f:selectItems value="#{searchall.loclist}" var="item2" itemLabel="#{item2.value}" itemValue="#{item2.id}" />
+   				</h:selectOneRadio>
+   				<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{searchall.savelocalesettings}" >
+						<f:ajax execute="@form" render=":ssettingss" onevent="closimi" />
+    				</h:commandButton>
+   				</h:form>
+   				<script>
+   				function closimi(data) {
+   				    if (data.status === 'success') {
+   				    	$("#myModal").modal('hide');
+   				    }
+   				}
+   				</script>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+					<h:form>
+					
+    				</h:form>
+				<!-- a href="#" class="btn btn-primary">Save changes</a -->
+			</div>
+			
+	</ui:define>
+</ui:composition>
+</html>
