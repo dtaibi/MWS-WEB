@@ -10,6 +10,7 @@
  ******************************************************************************/
 package de.unihannover.l3s.mws.bean;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -49,6 +50,7 @@ import de.unihannover.l3s.mws.dao.RicercaDao;
 import de.unihannover.l3s.mws.dao.SiteSetDao;
 import de.unihannover.l3s.mws.dao.StoryboardDao;
 import de.unihannover.l3s.mws.dao.TrackDao;
+import de.unihannover.l3s.mws.dao.URLContentDao;
 import de.unihannover.l3s.mws.dao.UtenteDao;
 import de.unihannover.l3s.mws.model.Generalsettings;
 import de.unihannover.l3s.mws.model.Ricerca;
@@ -63,6 +65,7 @@ import de.unihannover.l3s.mws.model.Storyboard;
 import de.unihannover.l3s.mws.model.StoryboardItem;
 import de.unihannover.l3s.mws.model.Track;
 import de.unihannover.l3s.mws.model.YData;
+import de.unihannover.l3s.mws.model.UrlContent;
 import de.unihannover.l3s.mws.model.timeline.Asset;
 import de.unihannover.l3s.mws.model.timeline.Timeline;
 import de.unihannover.l3s.mws.model.timeline.WholeTimeline;
@@ -1630,7 +1633,7 @@ public String refineVideoSearch(){
 		
 	}
 	
-	public String searcAll(int nuovo){
+	public String searcAll(int nuovo) throws IOException{
 		
 		
 		
@@ -1716,9 +1719,20 @@ public String refineVideoSearch(){
 			// WIKIMEDIA: http://en.wikipedia.org/w/api.php?action=query&titles=Berlin&prop=revisions&rvprop=timestamp&rvdir=newer&format=xml
 			// LASTFM: http://ws.audioscrobbler.com/2.0/?method=artist.getshouts&artist=Berlin&api_key=9b6009eca365ded3a03c2b9673d54eb9&page=3
 			List<String> ripetiz=new ArrayList<String>();
+			UrlContent obj1 = new UrlContent();
+			int temp_counter =1;
 			for (AzureSearchWebResult anr : arsall){
 				
-				
+				if(temp_counter==1)
+				{
+					obj1.SetUrl(anr.getUrl());
+					System.out.println(obj1.GetUrl());
+					obj1.SetContent();
+					System.out.println(obj1.GetContent());
+					URLContentDao ContentSave = new URLContentDao();
+					ContentSave.SaveURLContent(obj1); 
+					temp_counter++;
+				}
 				SearchWebResult r=new SearchWebResult();
 				r.setTitle(anr.getTitle());
 				// r.setDescription(tmgr.SingleTextToCheck(this.searchterms.get(0), anr.getDescription(), 0));
@@ -1729,6 +1743,7 @@ public String refineVideoSearch(){
 				if (!ripetiz.contains(r.getUrl())){
 					ripetiz.add(r.getUrl());
 					searchResultWeb.add(r);
+					
 				}
 			}
 			searchResult1=new ArrayList<SearchResult>(searchResultWeb);
