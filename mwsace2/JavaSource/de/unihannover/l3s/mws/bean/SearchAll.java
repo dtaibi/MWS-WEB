@@ -50,7 +50,7 @@ import de.unihannover.l3s.mws.dao.RicercaDao;
 import de.unihannover.l3s.mws.dao.SiteSetDao;
 import de.unihannover.l3s.mws.dao.StoryboardDao;
 import de.unihannover.l3s.mws.dao.TrackDao;
-import de.unihannover.l3s.mws.dao.URLContentDao;
+import de.unihannover.l3s.mws.dao.UrlContentDao;
 import de.unihannover.l3s.mws.dao.UtenteDao;
 import de.unihannover.l3s.mws.model.Generalsettings;
 import de.unihannover.l3s.mws.model.Ricerca;
@@ -1729,7 +1729,7 @@ public String refineVideoSearch(){
 					System.out.println(obj1.GetUrl());
 					obj1.SetContent();
 					System.out.println(obj1.GetContent());
-					URLContentDao ContentSave = new URLContentDao();
+					UrlContentDao ContentSave = new UrlContentDao();
 					ContentSave.SaveURLContent(obj1); 
 					temp_counter++;
 				}

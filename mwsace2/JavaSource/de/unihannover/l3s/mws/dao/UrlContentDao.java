@@ -12,7 +12,7 @@ import de.unihannover.l3s.mws.model.UrlContent;
 import de.unihannover.l3s.mws.util.HibernateUtil;
 
 
-public class URLContentDao {
+public class UrlContentDao {
 
 	public void SaveURLContent(UrlContent Content){
 		Transaction trns = null;
