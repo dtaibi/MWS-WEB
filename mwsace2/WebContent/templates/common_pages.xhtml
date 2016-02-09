@@ -34,6 +34,7 @@
 		<h:outputStylesheet library="theme" name="css/opa-icons.css" />
 		<h:outputStylesheet library="theme" name="css/uploadify.css" />										
 		
+		<h:outputStylesheet library="theme" name="css/jqcloud.css" />	
 		
 		<h:outputStylesheet library="timeline" name="css/timeline.css" />
 		<h:outputStylesheet library="timeline" name="css/stylestimeline.css" />	
@@ -141,6 +142,7 @@
 					<ul class="nav nav-tabs nav-stacked main-menu">
 						<li class="nav-header hidden-tablet">Main</li>
 						<li style="margin-left: 0px;"><form><a class="ajax-link" href="#"><i class="icon-home"></i><span class="hidden-tablet"></span></a><a class="ajax-link" href="basicSearch.jsf">Basic Search</a></form></li>
+						<li style="margin-left: 0px;"><form><a class="ajax-link" href="#"><i class="icon-home"></i><span class="hidden-tablet"></span></a><a class="ajax-link" href="languageSearch.jsf">Language Search</a></form></li>
 						<h:panelGroup rendered="#{searchall.user.utente.role != 'student'}"><li style="margin-left: 0px;"><form><a class="ajax-link" href="#"><i class="icon-eye-open"></i><span class="hidden-tablet"></span></a><a class="ajax-link" href="compareSearches.jsf">Compare Search</a></form></li></h:panelGroup>
 						<!-- li><a class="ajax-link" href="searchWork.jsf"><i class="icon-eye-open"></i><span class="hidden-tablet"> My Search works</span></a></li -->
 											
@@ -317,6 +319,8 @@
 	<h:outputScript library="theme" name="js/charisma.js" />
 	
 	<h:outputScript library="timeline" name="js/timeline.js" />
+	
+	<h:outputScript library="theme" name="js/jqcloud.js" />
 	
 	<h:outputScript library="theme" name="js/base64.js" />
 	<h:outputScript library="theme" name="js/canvas2image.js" />

@@ -16,6 +16,9 @@
 			  .sidebar-nav {
 				padding: 9px 0;
 			  }
+			  #narrowslider {
+			  	width: 30px;
+			  }
 		</style>
 		<h:outputStylesheet library="theme" name="css/bootstrap-responsive.css" />
 		<h:outputStylesheet library="theme" name="css/charisma-app.css" />
@@ -166,7 +169,7 @@
 						<a href="#">Home</a> <span class="divider">/</span>
 					</li>
 					<li>
-						<a href="#">Basic Search</a>
+						<a href="#">Language Search</a>
 					</li>
 				</ul>
 			</div>
@@ -195,6 +198,10 @@
 				<div class="box span12" style="margin-left: 0px">
 					<ui:insert name="searchlist"></ui:insert>
 				</div>
+				<div class="box span12" style="margin-left: 0px">
+					<ui:insert name="searchpanellist"></ui:insert>
+				</div>				
+				
 			</div>
 			
 						
