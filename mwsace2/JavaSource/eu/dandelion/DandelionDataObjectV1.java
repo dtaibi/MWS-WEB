@@ -1,9 +1,7 @@
 package eu.dandelion;
 
 
-import org.json.JSONArray;
-
-public class DandelionDataObject {
+public class DandelionDataObjectV1 {
 
 	long wordStartPosition;
 	public void setWordStartPosition(long wordStartPosition){this.wordStartPosition=wordStartPosition;};
@@ -36,15 +34,5 @@ public class DandelionDataObject {
 	String label;
 	public void setLabel(String label){this.label=label;};
 	public String getLabel(){return label;};
-	
-	JSONArray types;
-	public void setTypes(JSONArray types){
-			this.types = types;}
-	public JSONArray getTypes(){return types;}	
-	
-	JSONArray jsonArray;
-	public void setCatagories(JSONArray jsonArray){
-			this.jsonArray = jsonArray;}
-	public JSONArray getCatagories(){return jsonArray;}
 	
 }

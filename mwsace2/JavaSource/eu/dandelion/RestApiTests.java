@@ -1,13 +1,13 @@
 package eu.dandelion;
 
-
 import java.util.ArrayList;
-
+import java.util.HashSet;
 import org.apache.http.HttpException;
+import org.json.JSONException;
 
 public class RestApiTests {
 	
-	
+	private static String demoText="The Mona Lisa is a 16th century oil painting created by Leonardo. It's held at the Louvre in Paris.";
 	private static String shortText = "Pizza is a flatbread generally topped with tomato sauce and cheese and baked in an oven. "+
 			"It is commonly topped with a selection of meats, vegetables and condiments.";
 	private static String longText = "Pizza is a flatbread generally topped with tomato sauce and cheese and baked in an oven. "+
@@ -42,30 +42,45 @@ public class RestApiTests {
 			"make pizza readily available nationwide. "+
 			"It is so ubiquitous, thirteen percent of the U.S. population consumes pizza on any given day. ";
 
-	private static String itText = "Berlino ha un piano per prendere in mano i conti di tutti i Paesi dell'Unione europea e, se necessario, farli fallire e guidarne la transizione. A lanciare la sfida all'Ue, come sottolinea anche Federico Fubini sul Corriere della Sera, è il potentissimo governatore della Bundesbank Jens Weidmann: intervistato dal settimanale tedesco Focus, propone misure in perfetta linea con il ministro delle Finanze di Angela Merkel, l'altrettanto potentissimo e ultra-rigorista Wolfgang Schaeuble. In sintesi, la Bundesbank vorrebbe una nuova autorità per un controllo sui conti pubblici dei Paesi dell'euro, separata dalla Commissione di Bruxelles. ";
 	
-	private static String deText = "Bundesbankvorstandsmitglied Joachim Nagel hat sich dafür ausgesprochen, die sogenannte Anfa-Vereinbarung offenzulegen. Die Vereinbarung legt bilanzielle Obergrenzen fest für finanzielle, nicht-geldpolitische Geschäfte der nationalen Zentralbanken im Eurosystem. In keinem Fall dürfe eine monetäre Staatsfinanzierung erfolgen, sagte Nagel in einem zweiteiligen Interview mit der Börsen-Zeitung.  ";
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws JSONException {
 		
 		ArrayList<DandelionDataObject> objList = null;
-		EntityExtractionService service = null;
-		
+		ArrayList<String> stlist = new ArrayList<String>();
 		try {
-			objList=EntityExtractionService.postText(deText);
+			objList=EntityExtractionService.postText(demoText,"categories,types");
 		} catch (HttpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} ;
-		DBpediaConnect dbpc=new DBpediaConnect();
+		
 	for (int i=0; i<objList.size(); i++)	
 	{
-	// System.out.println(i);
-		System.out.println(objList.get(i).getLabel());
-		System.out.println(objList.get(i).getUri());
-		System.out.println(dbpc.getEng(objList.get(i).getUri()));
+	    System.out.println(i+"- "+objList.get(i).getLabel());
+	    if (objList.get(i).getCatagories()!=null)
+	    	for (int j=0; j<objList.get(i).getCatagories().length(); j++)
+		    	System.out.println(i+" : "+j+"- "+objList.get(i).getCatagories().getString(j));
+	    
+	    if (objList.get(i).getTypes()!=null){
+	    	for (int j=0; j<objList.get(i).getTypes().length(); j++)
+	    		System.out.println("types:"+i+" : "+j+"- "+objList.get(i).getTypes().getString(j));
+	    }
+	    stlist.add(objList.get(i).getLabel());
+	
+	}
+	
+//	Set hs= ;
+	// stlist = new ArrayList<String>(new HashSet<String>(stlist));
+	//stlist = new HashSet<String>(Arrays.asList(stlist)).toArray(new String[0]);
+//	for (int i=0; i<stlist.size(); i++)	
+//	{
+	//	System.out.println(i+": "+stlist.get(i));
+		
+//	}
+	
 	}
 	}
-}
+
 
 
