@@ -29,7 +29,7 @@
 		</div>
 
 		<h:panelGroup id="ssettingss">
-			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px; margin-top:20px;" rendered="#{not empty searchall.searchsettings}">
+			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px; margin-top:20px;" rendered="#{not empty languagesearch.searchsettings}">
 				<p><h:outputText value="#{languagesearch.searchsettings}" escape="false"/></p>
 			</h:panelGroup>
 		</h:panelGroup>
@@ -49,13 +49,8 @@
 					<ui:repeat id="resultstable3" value="#{languagesearch.searchResultEn}" var="result" rendered="#{not empty languagesearch.searchResultEn}">
 						<tr>
 							<td>
-								<div>			
 	                				<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
 									<h:outputText value="#{result.description}" escape="false" />
-								</div>
-								<div>
-									<input type="checkbox" onclick="remove" checked="checked"></input>
-								</div>
 	            			</td>
 						</tr>
 					</ui:repeat>
@@ -75,9 +70,6 @@
 	 	</a4j:jsFunction>
 	 	<a4j:jsFunction name="showde"  action="#{languagesearch.filterSearch('de')}" render="searchlistres">
 	 		<a4j:param name="text" assignTo="#{languagesearch.clickedTag}" />
-	 	</a4j:jsFunction>
-	 	<a4j:jsFunction name="remove"  action="#{languagesearch.removeTag()}" render="searchlistres">
-	 		<a4j:param name="text" assignTo="#{languagesearch.Tag}" />
 	 	</a4j:jsFunction>
 	</h:form>
 </ui:define>
@@ -371,10 +363,10 @@ $('#demoit').jQCloud(words3, {heigth: 500, width: 1032, autoResize: true});
     
     function drawit(words) {
         d3.select("#demoit").append("svg")
-            .attr("width", 500)
+            .attr("width", 1000)
             .attr("height", 500)
           .append("g")
-            .attr("transform", "translate(250,250)")
+            .attr("transform", "translate(500,250)")
           .selectAll("text")
             .data(words)
           .enter().append("text")
@@ -393,10 +385,10 @@ $('#demoit').jQCloud(words3, {heigth: 500, width: 1032, autoResize: true});
     
     function drawen(words) {
         d3.select("#demoen").append("svg")
-            .attr("width", 500)
+            .attr("width", 1000)
             .attr("height", 500)
           .append("g")
-            .attr("transform", "translate(250,250)")
+            .attr("transform", "translate(500,250)")
           .selectAll("text")
             .data(words)
           .enter().append("text")
@@ -415,10 +407,10 @@ $('#demoit').jQCloud(words3, {heigth: 500, width: 1032, autoResize: true});
     
     function drawes(words) {
         d3.select("#demoes").append("svg")
-            .attr("width", 500)
+            .attr("width", 1000)
             .attr("height", 500)
           .append("g")
-            .attr("transform", "translate(250,250)")
+            .attr("transform", "translate(500,250)")
           .selectAll("text")
             .data(words)
           .enter().append("text")
@@ -437,10 +429,10 @@ $('#demoit').jQCloud(words3, {heigth: 500, width: 1032, autoResize: true});
  
     function drawde(words) {
         d3.select("#demo").append("svg")
-            .attr("width", 500)
+            .attr("width", 1000)
             .attr("height", 500)
           .append("g")
-            .attr("transform", "translate(250,250)")
+            .attr("transform", "translate(500,250)")
           .selectAll("text")
             .data(words)
           .enter().append("text")

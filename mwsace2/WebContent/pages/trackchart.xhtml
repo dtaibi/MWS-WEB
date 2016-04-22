@@ -7,11 +7,9 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:ez="http://java.sun.com/jsf/composite/demo">
 
-
 <ui:composition template="/templates/common_pages_story_play.xhtml">
 	<ui:define name="pageTitle">MWS - Track Analysis</ui:define>
 	<ui:define name="pageHeader">Track Analysis</ui:define>
-
 
 	<ui:define name="body">
 
@@ -20,13 +18,41 @@
 				<i class="icon-info-sign"></i> Track Analysis 
 			</h2>
 			<div class="box-icon">
-				<a href="#" class="btn btn-setting btn-round"><i
-					class="icon-cog"></i></a>
+				<a href="#" class="btn btn-setting btn-round">
+				<i class="icon-cog"></i></a>
 			</div>
 		</div>
-		OUR CHART HAVE TO BE INSERTED HERE
+		    
+		<h1>Generated  Operation with Object array and iterate with Var :</h1>
+		 Selected Operation
+    	<h:form>
+			<h:selectOneMenu value="#{tracks.operation}" valueChangeListener="{tracks.operationChanged}">
+				<f:selectItem itemValue="#{null}" itemLabel="--select--" />
+			    <f:selectItems value="#{tracks.operationValue}" var="o" itemLabel="#{o.operationLabel}" itemValue="#{o.operationValue}" />
+   				<f:ajax listener="#{tracks.changeOperation}" render="optable" />
+   			</h:selectOneMenu>
+   			
+   			<h:selectOneMenu value="#{tracks.userselected}" valueChangeListener="{tracks.userChanged}">
+   				 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+   			     <f:selectItems value="#{tracks.userselectedList}" var="o" itemLabel="#{o.username}" itemValue="#{o.id}" />
+   				 <f:ajax listener="#{tracks.changeUserselected}" render="optable" />
+   			 </h:selectOneMenu>
 		
-		this is a new line
+			<h:panelGroup id="optable">
+				<table class="table table-striped table-bordered bootstrap-datatable datatable" >
+					<tbody>
+					<ui:repeat id="resultstable" value="#{tracks.list}" var="result" rendered="#{not empty tracks.list}">
+						<tr>
+							<td> <h:outputText value="#{result.id}" /> </td>
+							<td> <h:outputText value="#{result.date}" /> </td>
+							<td> <h:outputText value="#{result.operation}" /> </td>
+							<td> <h:outputText value="#{result.utente.username}" /> </td>
+						</tr>
+					</ui:repeat>
+					</tbody> 
+				</table>
+			</h:panelGroup> 
+		</h:form> 						
 	</ui:define>
 </ui:composition>
 </html>

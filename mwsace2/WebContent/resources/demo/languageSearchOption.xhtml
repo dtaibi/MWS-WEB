@@ -62,7 +62,13 @@
 			</tr>
 			<tr>
 			<td>Predefined query:</td>
-			<td><a href="#" onclick="loadPredefinedQuery(1)">Rights</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="loadPredefinedQuery(2)">Climate Change</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="loadPredefinedQuery(3)">Zika virus</a></td>
+			<td>
+				<a href="#" onclick="loadPredefinedQuery(1)">Rights</a>&nbsp;&nbsp;&nbsp;
+				<a href="#" onclick="loadPredefinedQuery(2)">Climate Change</a>&nbsp;&nbsp;&nbsp;
+				<a href="#" onclick="loadPredefinedQuery(3)">Zika virus</a>&nbsp;&nbsp;&nbsp;
+				<a href="#" onclick="loadPredefinedQuery(4)">Green Tips</a>&nbsp;&nbsp;&nbsp;
+				<a href="#" onclick="loadPredefinedQuery(5)">Nuclear</a>
+			</td>
 			</tr>
 			</table>
 			<script>
@@ -85,6 +91,18 @@
 					$("#helloForm\\:searchinput\\:inputit").val('Virus Zika');
 					$("#helloForm\\:searchinput\\:inputde").val('Zika-Virus');
 					$("#helloForm\\:searchinput\\:inputfr").val('Virus Zika');
+					break;	
+				case 4:
+					$("#helloForm\\:searchinput\\:inputen").val('green tips');
+					$("#helloForm\\:searchinput\\:inputit").val('consigli ecologici');
+					$("#helloForm\\:searchinput\\:inputde").val('grüne tipps');
+					$("#helloForm\\:searchinput\\:inputfr").val('astuces écologique');
+					break;	
+				case 5:
+					$("#helloForm\\:searchinput\\:inputen").val('nuclear');
+					$("#helloForm\\:searchinput\\:inputit").val('nucleare');
+					$("#helloForm\\:searchinput\\:inputde").val('nuklear');
+					$("#helloForm\\:searchinput\\:inputfr").val('nucléaire');
 					break;	
 					
 				}
