@@ -23,7 +23,7 @@ public class Track {
 	private String param2;
 	private String param3;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "utente", nullable = false)
 	private Utente utente;
 	

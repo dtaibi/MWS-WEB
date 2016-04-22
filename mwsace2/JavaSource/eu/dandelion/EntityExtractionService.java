@@ -122,6 +122,7 @@ public class EntityExtractionService {
 			
 			List<NameValuePair> formparams = new ArrayList<NameValuePair>();
 			formparams.add(new BasicNameValuePair(type, text));
+			formparams.add(new BasicNameValuePair("min_confidence", minConfidence+""));
 			formparams.add(new BasicNameValuePair("$app_id", "0265a8b0"));
 			formparams.add(new BasicNameValuePair("$app_key", "a0024056b204587f4564687f55e7ab85"));
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
@@ -214,8 +215,13 @@ public class EntityExtractionService {
 			List<NameValuePair> formparams = new ArrayList<NameValuePair>();
 			formparams.add(new BasicNameValuePair("text", text));
 			formparams.add(new BasicNameValuePair("include", "types"));
-			formparams.add(new BasicNameValuePair("$app_id", "0265a8b0"));
-			formparams.add(new BasicNameValuePair("$app_key", "a0024056b204587f4564687f55e7ab85"));
+			formparams.add(new BasicNameValuePair("min_confidence", minConfidence+""));
+			// formparams.add(new BasicNameValuePair("$app_id", "0265a8b0"));
+			// formparams.add(new BasicNameValuePair("$app_key", "a0024056b204587f4564687f55e7ab85"));
+			
+			formparams.add(new BasicNameValuePair("$app_id", "1145b358"));
+			formparams.add(new BasicNameValuePair("$app_key", "226e46f8067efd14ea58d05d4b4a25c1"));
+			
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
 			
 			

@@ -17,14 +17,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -50,7 +46,6 @@ import de.unihannover.l3s.mws.dao.UtenteDao;
 import de.unihannover.l3s.mws.model.Generalsettings;
 import de.unihannover.l3s.mws.model.SearchResult;
 import de.unihannover.l3s.mws.model.SearchWebResult;
-import de.unihannover.l3s.mws.model.SiteSetItem;
 import de.unihannover.l3s.mws.model.Track;
 import de.unihannover.l3s.mws.util.TextManager;
 import eu.dandelion.DBpediaConnect;
@@ -64,8 +59,6 @@ import eu.dandelion.EntityExtractionService;
 @ManagedBean(name="languagesearch")
 @ViewScoped
 public class LanguageSearch {
-	private String searchtype="Web";
-	private ArrayList<String> searchtypelist=null;
 
 	private List<String> searchterms;
 	@ManagedProperty(value="#{user}")
@@ -562,27 +555,7 @@ public class LanguageSearch {
 	
 	
 		
-	public String getSearchtype() {
-		return searchtype;
-	}
 
-	public void setSearchtype(String searchtype) {
-		this.searchtype = searchtype;
-	}
-
-		public ArrayList<String> getSearchtypelist() {
-		if (searchtypelist==null){
-			searchtypelist=new ArrayList<String>();
-			searchtypelist.add("Web");
-			searchtypelist.add("Image");
-			searchtypelist.add("Video");
-		}
-		return searchtypelist;
-	}
-
-	public void setSearchtypelist(ArrayList<String> searchtypelist) {
-		this.searchtypelist = searchtypelist;
-	}	
 
 	
 	public ArrayList<SearchResult> resultList(String lang){
@@ -597,14 +570,15 @@ public class LanguageSearch {
 		return searchResultWeb;
 	}
 	
-
+	
 Map<Integer, Integer> indexSearchResult;
 Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String, Map<String, ArrayList<Integer>>>();
 
 
 	private Map<String,Integer> createTagCloud (String q, String lang, String radiowebnews){
 		String accountKey = "BmbX+6Sy9/VEcS5oOjurccO5MQpKr2ewvLQ2vRHBKXQ";
-		
+		// accountKey = "1145b358/226e46f8067efd14ea58d05d4b4a25c1";
+		// accountKey="b5e0c812/87ddc4f508e0322abe43b9edd7b4adba";
 		if (radiowebnews.compareTo("web")==0){
 		
 			AzureSearchWebQuery aq = new AzureSearchWebQuery();
@@ -699,6 +673,7 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
             e.printStackTrace();
         }
 	}
+		System.out.println("Dandelion Start");
 		indexSearchResult=new HashMap<Integer, Integer> ();
 		String textToAnalyse="";
 		for (int index=0;index<searchResultWeb.size();index++){
@@ -904,12 +879,15 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		
 		Map<String, Integer> conceptFreq=new HashMap<String, Integer>();
 		conceptFreq=createTagCloud(q, "de", this.radiowebnews);
+		
 		tagclouddata=" var wordsde = [ ";
 		for (String key : conceptFreq.keySet()){
-			tagclouddata+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+conceptFreq.get(key)*15+"}, ";
+			Integer size=conceptFreq.get(key); if (size>12) size=12; 
+			tagclouddata+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+size*7+"}, ";
+			System.out.println("de;"+key+";"+conceptFreq.get(key));
 		}
 		// tagclouddata+=" ]; $('#demo').jQCloud(words, {heigth: 500, width: 1032, autoResize: true}); ";
-		tagclouddata+="]; d3.layout.cloud().size([500, 500]).words(wordsde).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawde).start();";
+		tagclouddata+="]; d3.layout.cloud().size([1000, 500]).words(wordsde).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawde).start();";
 		
 		// tagclouddata+=" function showdetail(lang,text){ alert('You clicked the word '+lang+' in '+text); }";
 		q="";
@@ -919,10 +897,12 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		conceptFreq=createTagCloud(q, "it", this.radiowebnews);			
 		tagclouddatait=" var wordsit = [ ";
 		for (String key : conceptFreq.keySet()){
-			tagclouddatait+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+conceptFreq.get(key)*15+"}, ";
+			Integer size=conceptFreq.get(key); if (size>12) size=12;
+			tagclouddatait+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+size*7+"}, ";
+			System.out.println("it;"+key+";"+conceptFreq.get(key));
 		}
 		// tagclouddatait+=" ]; $('#demoit').jQCloud(wordsit, {heigth: 500, width: 1032, autoResize: true});";
-		tagclouddatait+="]; d3.layout.cloud().size([500, 500]).words(wordsit).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawit).start();";
+		tagclouddatait+="]; d3.layout.cloud().size([1000, 500]).words(wordsit).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawit).start();";
 		
 		q="";
 		q+="\""+searchterms.get(3)+"\"";
@@ -931,10 +911,12 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		conceptFreq=createTagCloud(q, "fr", this.radiowebnews);	
 		tagclouddataes=" var wordses = [ ";
 		for (String key : conceptFreq.keySet()){
-			tagclouddataes+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+conceptFreq.get(key)*15+"}, ";
+			Integer size=conceptFreq.get(key); if (size>12) size=12;
+			tagclouddataes+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+size*7+"}, ";
+			System.out.println("fr;"+key+";"+conceptFreq.get(key));
 		}
 		// tagclouddataes+=" ]; $('#demoes').jQCloud(wordses, {heigth: 500, width: 1032, autoResize: true});";
-		tagclouddataes+="]; d3.layout.cloud().size([500, 500]).words(wordses).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawes).start();";
+		tagclouddataes+="]; d3.layout.cloud().size([1000, 500]).words(wordses).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawes).start();";
 		q="";
 		q+="\""+searchterms.get(0)+"\"";
 		// q+=" language:en ";
@@ -942,16 +924,18 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		conceptFreq=createTagCloud(q, "en", this.radiowebnews);			
 		tagclouddataen=" var wordsen = [ ";
 		for (String key : conceptFreq.keySet()){
-			tagclouddataen+=" { text: \""+key.replace("http://en.wikipedia.org/wiki/", "")+"\", size: "+conceptFreq.get(key)*15+"}, ";
+			Integer size=conceptFreq.get(key); if (size>12) size=12;
+			tagclouddataen+=" { text: \""+key.replace("http://en.wikipedia.org/wiki/", "")+"\", size: "+size*7+"}, ";
+			System.out.println("en;"+key+";"+conceptFreq.get(key));
 		}
 		// tagclouddataen+=" ]; $('#demoen').jQCloud(wordsen);";
-		tagclouddataen+="]; d3.layout.cloud().size([500, 500]).words(wordsen).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawen).start();";
+		tagclouddataen+="]; d3.layout.cloud().size([1000, 500]).words(wordsen).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawen).start();";
 		
 		Track track=new Track();
 	        track.setDate((new GregorianCalendar()).getTime());
 	        track.setOperation("languagesearch");
 	        track.setParam1(q);
-	        track.setParam2(this.searchtype);
+	        track.setParam2(this.radiowebnews);
 	        track.setParam3("");
 	        track.setUtente(this.user.getUtente());
 	        TrackDao td=new TrackDao();
