@@ -16,29 +16,53 @@ package net.billylieurance.azuresearch;
  limitations under the License.
  */
 
+/**
+ *
+ * @author wlieurance
+ */
+
 public abstract class AbstractAzureSearchResult {
 
-	public String getId() {
-		return _id;
-	}
+    /**
+     *
+     * @return
+     */
+    public String getId() {
+        return _id;
+    }
 
-	public void setId(String _id) {
-		this._id = _id;
-	}
+    /**
+     *
+     * @param _id
+     */
+    public void setId(String _id) {
+        this._id = _id;
+    }
 
-	public String getTitle() {
-		return _title;
-	}
+    /**
+     *
+     * @return
+     */
+    public String getTitle() {
+        return _title;
+    }
 
-	public void setTitle(String _title) {
-		this._title = _title;
-	}
+    /**
+     *
+     * @param _title
+     */
+    public void setTitle(String _title) {
+        this._title = _title;
+    }
 
+    /**
+     *
+     */
+    protected String _id;
 
-
-	protected String _id;
-	protected String _title;
-
-	
+    /**
+     *
+     */
+    protected String _title;
 
 }

@@ -11,6 +11,7 @@
 package de.unihannover.l3s.mws.bean;
 
 import java.io.IOException;
+
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -474,7 +475,7 @@ public class LanguageSearch {
 	@PostConstruct
     public void init() {
 		radiowebnews="web";
-		minconfidence=0.2;
+		minconfidence=0.6;
 		/*excludelist.add("wikipedia.org");
 		excludelist.add("youtube.com");
 		excludelist.add("linkedin.com");

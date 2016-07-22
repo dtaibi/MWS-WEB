@@ -2,8 +2,6 @@ package de.unihannover.l3s.mws.model;
 
 import net.billylieurance.azuresearch.BingThumbnail;
 
-import com.google.code.bing.search.schema.multimedia.Thumbnail;
-
 public class SearchVideoResult extends SearchResult {
 	private String click_url;
 	private int width;

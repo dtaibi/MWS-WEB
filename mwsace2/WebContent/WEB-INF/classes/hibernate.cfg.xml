@@ -14,6 +14,9 @@
     <property name="hibernate.c3p0.max_statements">100</property>
     <property name="hibernate.c3p0.timeout">1800</property>
     <property name="hibernate.c3p0.validationQuery">SELECT 1</property>
+    <mapping class="de.unihannover.l3s.mws.model.Bingcache" />
+    <mapping class="de.unihannover.l3s.mws.model.Dandelioncache" />
+    <mapping class="de.unihannover.l3s.mws.model.Dbpediacache" />
     <mapping class="de.unihannover.l3s.mws.model.Track" />
     <mapping class="de.unihannover.l3s.mws.model.Utente" />
     <mapping class="de.unihannover.l3s.mws.model.Ricerca" />

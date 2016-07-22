@@ -139,15 +139,38 @@ public class TrackDao {
 
 	public List<Track> getTrackByOperationAndUser(String operation,
 			String userselected) {
+		if (operation!=null && operation.trim().compareTo("")==0)
+			operation=null;
+		if (userselected!=null && userselected.trim().compareTo("")==0)
+			userselected=null;
+		
+		if (operation==null && userselected==null)
+			return this.getAllTrackBeans();
+		
+		
 		List<Track> list;
         Session session = HibernateUtil.getSessionFactory().openSession();
         
         try {
         	session.beginTransaction();
-        	String queryString = "from Track t where utente = :utente and operation = :operation";
-            Query query = session.createQuery(queryString);
-            query.setString("utente", userselected);
-            query.setString("operation", operation);
+        	String queryString ="";
+        	if (operation==null)
+        		queryString = "from Track t where utente = :utente ";
+        	else if (userselected==null)
+        		queryString = "from Track t where operation = :operation";
+        	else
+        		queryString = "from Track t where utente = :utente and operation = :operation";
+            
+        	Query query = session.createQuery(queryString);
+            // System.out.println(queryString+"::"+operation+"::"+userselected);
+            if (operation==null)
+            	query.setString("utente", userselected);
+            else if (userselected==null)
+            	query.setString("operation", operation);
+            else {
+            	query.setString("utente", userselected);
+            	query.setString("operation", operation);
+            }
             list = query.list();
             return list;
         } catch (RuntimeException e) {

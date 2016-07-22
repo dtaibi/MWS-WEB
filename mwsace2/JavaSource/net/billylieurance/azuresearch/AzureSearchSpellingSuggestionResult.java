@@ -16,25 +16,33 @@ package net.billylieurance.azuresearch;
  limitations under the License.
  */
 
+/**
+ *
+ * @author wlieurance
+ */
+
 public class AzureSearchSpellingSuggestionResult extends AbstractAzureSearchResult {
 
-	/*
-        <d:ID m:type="Edm.Guid">a48d5602-41c4-4b38-8959-14da67c20728</d:ID>
-        <d:Value m:type="Edm.String">oklahoma sooners</d:Value>
-	 */
+    /*
+     <d:ID m:type="Edm.Guid">a48d5602-41c4-4b38-8959-14da67c20728</d:ID>
+     <d:Value m:type="Edm.String">oklahoma sooners</d:Value>
+     */
+    private String _value;
 
-	private String _value;
+    /**
+     *
+     * @return
+     */
+    public String getValue() {
+        return _value;
+    }
 
-	public String getValue() {
-		return _value;
-	}
-
-	public void setValue(String value) {
-		_value = value;
-	}
-
-
-
-	
+    /**
+     *
+     * @param value
+     */
+    public void setValue(String value) {
+        _value = value;
+    }
 
 }

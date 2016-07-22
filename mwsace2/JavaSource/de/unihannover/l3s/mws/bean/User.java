@@ -87,6 +87,16 @@ public class User {
 			track.setParam1(this.name);
 			track.setUtente(this.utente);
 			td.addTrack(track);
+			if (this.utente.getRole().compareTo("wsstudent")==0)
+				return "languageSearchStudent";
+			if (this.utente.getRole().compareTo("nosarweb")==0)
+				return "searchListStudent";
+			if (this.utente.getRole().compareTo("nosarweb2")==0)
+				return "searchListStudent2";
+			if (this.utente.getRole().compareTo("hackathon")==0)
+				return "hackathon";
+			if (this.utente.getRole().compareTo("external")==0)
+				return "languageSearch";
 			return "basicSearch";
 		} else {
 			this.utente = null;

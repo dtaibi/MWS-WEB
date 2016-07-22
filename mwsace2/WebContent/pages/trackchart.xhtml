@@ -12,7 +12,7 @@
 	<ui:define name="pageHeader">Track Analysis</ui:define>
 
 	<ui:define name="body">
-
+		<script src= "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 		<div class="box-header well">
 			<h2>
 				<i class="icon-info-sign"></i> Track Analysis 
@@ -24,18 +24,43 @@
 		</div>
 		    
 		<h1>Generated  Operation with Object array and iterate with Var :</h1>
-		 Selected Operation
+		
+		
+		 <h:panelGroup id="canvaspanel">
+			  <script>
+			 	<h:outputText value="#{tracks.jchartcode}" />
+			 </script>
+			 <script>
+			 if( window.myBar!==undefined){
+			     window.myBar.destroy();
+			     var ctx = document.getElementById("canvas").getContext("2d");
+			        window.myBar = new Chart(ctx).Bar(barChartData, {
+			            responsive : true
+			        });
+			     }
+			 	window.onload = function(){
+			        var ctx = document.getElementById("canvas").getContext("2d");
+			        window.myBar = new Chart(ctx).Bar(barChartData, {
+			            responsive : true
+			        });
+			    }
+			 </script>
+			 <div style="width: 75%">
+	            <canvas id="canvas" height="450" width="800"></canvas>
+	        </div>
+        </h:panelGroup>
+		  Selected Operation
     	<h:form>
 			<h:selectOneMenu value="#{tracks.operation}" valueChangeListener="{tracks.operationChanged}">
 				<f:selectItem itemValue="#{null}" itemLabel="--select--" />
 			    <f:selectItems value="#{tracks.operationValue}" var="o" itemLabel="#{o.operationLabel}" itemValue="#{o.operationValue}" />
-   				<f:ajax listener="#{tracks.changeOperation}" render="optable" />
+   				<f:ajax listener="#{tracks.changeOperation}" render="optable :canvaspanel" />
    			</h:selectOneMenu>
    			
    			<h:selectOneMenu value="#{tracks.userselected}" valueChangeListener="{tracks.userChanged}">
    				 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
    			     <f:selectItems value="#{tracks.userselectedList}" var="o" itemLabel="#{o.username}" itemValue="#{o.id}" />
-   				 <f:ajax listener="#{tracks.changeUserselected}" render="optable" />
+   				 <f:ajax listener="#{tracks.changeUserselected}" render="optable :canvaspanel" />
    			 </h:selectOneMenu>
 		
 			<h:panelGroup id="optable">
