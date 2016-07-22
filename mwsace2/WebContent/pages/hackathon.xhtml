@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+
+<ui:composition template="/templates/hackathon_template.xhtml">
+	<ui:define name="pageTitle">MWS - Search</ui:define>
+	<ui:define name="pageHeader">SaR-Web Search</ui:define>
+
+	<ui:define name="body">
+		<div style="float:left;">
+		<h:form id="helloForm" ajaxSubmit="true">
+			<ez:hackathonSearchOption id="searchinput"
+				searchResult="#{hackathon.searchResult1}" label="#{msgs.search}"
+				item="#{hackathon.searchtype}" list="#{hackathon.searchtypelist}"
+				values="#{hackathon.searchterms}" extend="#{hackathon.extend}"
+				radioselect = "#{hackathon.radiowebnews}" minconfidence="#{hackathon.minconfidence}"
+				action="#{hackathon.searcAll(1)}" submitlabel="Start Search" />
+		</h:form>
+		</div>
+
+		<h:panelGroup id="ssettingss">
+			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px; margin-top:20px;" rendered="#{not empty hackathon.searchsettings}">
+				<p><h:outputText value="#{hackathon.searchsettings}" escape="false"/></p>
+			</h:panelGroup>
+		</h:panelGroup>
+	</ui:define>
+
+
+<ui:define name="searchlist">
+	<div class="tab-pane" id="messages">
+		<h:panelGroup id="searchlistres">
+			
+		</h:panelGroup>
+	</div>
+	 <h:form> 
+	 	<a4j:jsFunction name="showmore"  action="#{hackathon.showmore}" render="moreinfo">
+	 		<a4j:param name="c1" assignTo="#{hackathon.diff1}" />
+	 		<a4j:param name="c2" assignTo="#{hackathon.diff2}" />
+	 	</a4j:jsFunction>
+	</h:form>
+</ui:define>
+
+<ui:define name="searchpanellist">
+<a name="moreinfopanel"></a>
+	<div class="box-header well">
+		<h2><i class="icon-list"></i> More Info</h2>
+		<div class="box-icon">
+			<a href="#" class="btn btn-minimize btn-round">
+				<i id="sbtn" class="icon-chevron-down"></i>
+			</a> 
+			<a href="#" class="btn btn-close btn-round">
+				<i class="icon-remove"></i>
+			</a>
+		</div>
+	</div>
+	<div class="box-content" id="minsearchbtn2">
+		<div class="box-content">
+		<h:panelGroup id="moreinfo">
+		<p><h:outputText value="#{hackathon.moreinfo}" escape="false"/></p> 
+		</h:panelGroup>
+		</div>
+	</div>
+
+
+	<div class="box-header well">
+			
+	</div>
+	<div class="box-content" id="minsearchbtn">
+		<div class="box-content">
+					
+		</div>
+	</div>
+	
+	</ui:define>
+
+
+	<ui:define name="searchpanel">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Search Result
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+				<h:panelGroup id="out">
+					<div id="timeline-embed" style="width: 100%; height: 600px"></div>
+    					
+				</h:panelGroup>
+			</div>
+		</div>
+	</ui:define>
+
+	<ui:define name="piechartdata">
+		<h:panelGroup id="out2web"> 
+			<script>
+    			<h:outputText value="#{hackathon.javascriptTimeline}" escape="false" />
+    		</script>
+			<script>
+				<ui:repeat value="#{hackathon.searchClouds}" var="cloud">	
+					<h:outputText value="#{cloud.javascriptData}" escape="false" />
+				</ui:repeat>
+				
+				var fill = d3.scale.category20();
+
+				<ui:repeat value="#{hackathon.searchClouds}" var="cloud">	
+					<h:outputText value="#{cloud.javascriptCloud}" escape="false" />
+				</ui:repeat>
+			</script>
+			
+			
+		</h:panelGroup>
+
+		<script>
+			function openSaveForm(){
+				$(".saveform").toggle();
+			}
+			function openOpenForm(){
+				$(".openform").toggle();
+			}
+			function openAddStoryButton(){
+				$(".addstorybutton").toggle();
+			}
+		</script>
+
+		
+		
+
+			
+	</ui:define>
+	
+<ui:define name="modal">
+		
+		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>Search Settings</h3>
+			</div>
+			<div class="modal-body">
+				
+				<h:form id="modallang" ajaxSubmit="true">
+				
+				<h:selectOneRadio value="#{hackathon.radiowebnews}" >
+   					<f:selectItem  itemValue="news" itemLabel="News Search" /> 
+   					<f:selectItem  itemValue="web" itemLabel="Web Search" />
+   				</h:selectOneRadio>
+   				<table>
+   				<tr>	
+   				<td>Confidence Value:</td>
+   				<td><rich:inputNumberSlider value="#{hackathon.minconfidence}" id="narrowslider" maxValue="1" step="0.05" showArrows="false" showInput = "false" showTooltip="true" /></td>
+   				</tr>
+   				<tr>
+   				<td>Result number:</td>
+   				<td><rich:inputNumberSpinner value="#{hackathon.resultnumber}" cycled="false" step="5" minValue="5" maxValue="50"/></td>
+   				</tr>
+   				<tr>
+   				<td>Include Full Text:</td>
+   				<td>
+   					<h:selectManyCheckbox value="#{hackathon.includeFullText}">
+   						<f:selectItem itemValue="true" itemLabel="" />
+   					</h:selectManyCheckbox>
+   				</td>
+   				</tr>
+   				</table>
+   				<br/>
+   				<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{hackathon.loadRestriction}" >
+					<f:ajax execute="@form" render=":ssettingss" onevent="closimi" />
+    			</h:commandButton>
+   				</h:form>
+   				<script>
+   				function closimi(data) {
+   				    if (data.status === 'success') {
+   				    	$("#myModal").modal('hide');
+   				    }
+   				}
+   				</script>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+					<h:form>
+					
+    				</h:form>
+				<!-- a href="#" class="btn btn-primary">Save changes</a -->
+			</div>
+			
+	</ui:define>
+	
+</ui:composition>
+</html>

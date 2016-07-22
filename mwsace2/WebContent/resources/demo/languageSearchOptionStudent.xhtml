@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:composite="http://java.sun.com/jsf/composite"
+	  xmlns:a4j="http://richfaces.org/a4j"
+	  xmlns:rich="http://richfaces.org/rich"
+      xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+	<composite:interface>
+		<composite:attribute name="label"/>
+		<composite:attribute name="values" required="true"/>
+		<composite:attribute name="extend" required="true" method-signature="java.lang.String f()"/>
+		<composite:attribute name="item" required="true"/>
+		<composite:attribute name="list" required="true"/>
+		<composite:attribute name="searchResult" required="true"/>
+		<composite:attribute name="action" required="true" method-signature="java.lang.String f()"/>
+		<composite:attribute name="submitlabel"/>
+		<composite:attribute name="minconfidence"/>
+	</composite:interface>
+
+	<composite:implementation>
+    	<table>
+    	<tr>
+    	<td colspan="2">
+    		<h:outputText value="#{cc.attrs.label}" />
+    	</td>
+    	</tr>
+    	<tr>	
+    	<td>
+   	 		en:
+   	 		</td><td>
+    		<h:inputText id="inputen" value="#{cc.attrs.values[0]}"/>
+			</td>
+			</tr>
+			<tr>
+			<td>
+			de:
+			</td>
+			<td>
+			<h:inputText id="inputde" value="#{cc.attrs.values[1]}"/>
+			</td>
+			</tr>
+			<tr>
+			<td>Predefined query:</td>
+			<td>
+				<a href="#" onclick="loadPredefinedQuery(1)">Rights</a>&nbsp;&nbsp;&nbsp;
+				<a href="#" onclick="loadPredefinedQuery(2)">Nuclear</a>
+			</td>
+			</tr>
+			</table>
+			<script>
+			function loadPredefinedQuery(selection){
+				switch(selection){
+				case 1:
+					$("#helloForm\\:searchinput\\:inputen").val('rights');
+					$("#helloForm\\:searchinput\\:inputde").val('rechte');
+					break;
+				case 2:
+					$("#helloForm\\:searchinput\\:inputen").val('nuclear');
+					$("#helloForm\\:searchinput\\:inputde").val('nuklear');
+					break;
+				}
+			}
+
+		</script>
+    		<a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}" alt="ai" />
+            </f:facet>
+        </a4j:status>
+    		<br />
+    		<br />
+    		<h:commandButton value="#{cc.attrs.submitlabel}" >
+        		<f:ajax listener="#{cc.attrs.action}" execute="@form" render="@form :searchlistres :out :out2web :outtablede :out_ :outtablede_ :out2_ :outtablede2_" />
+    		</h:commandButton>
+			<br /><br />
+	</composite:implementation>
+</html>
