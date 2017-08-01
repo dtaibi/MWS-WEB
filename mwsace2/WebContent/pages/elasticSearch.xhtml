@@ -12,51 +12,52 @@
     <f:event type="preRenderView" listener="#{elasticsearch.loadSearch(1)}"/>
 </f:metadata>
 
-<ui:composition template="/templates/common_pages.xhtml">
+<ui:composition template="/templates/elasticsearch_pages.xhtml">
 	<ui:define name="pageTitle">MWS - Elastic Search page</ui:define>
 	<ui:define name="pageHeader">Elastic Search</ui:define>
 
 	<ui:define name="body">
 		<div style="float:left;">
-		<h:form id="helloForm" ajaxSubmit="true">
-			<ez:basicSearchOption id="searchinput"
-				searchResult="#{elasticsearch.searchResult1}" label="#{msgs.search}"
-				item="#{elasticsearch.searchtype}" list="#{elasticsearch.searchtypelist}"
-				values="#{elasticsearch.searchterms}" extend="#{elasticsearch.extend}"
-				action="#{elasticsearch.searcAll(1)}" submitlabel="Start ElasticSearch" />
-		</h:form>
+			
+			<div id="minsearchbtn1" class="box-content" >
+				<div class="box-content">
+					<ul id="myTab" class="nav nav-tabs" >
+						<li><a href="#word">Word</a></li>
+						<li><a href="#scene">Scene</a></li>
+						<li><a href="#dialogue">Dialogue</a></li>
+					</ul>
+					<h:form id="helloForm" ajaxSubmit="true">
+					<div id="myTabContent1" class="tab-content">
+						<div id="word" class="tab-pane" >
+							<ez:elasticSearchOption id="searchinput" label="Search Term" idpane="word"
+							values="#{elasticsearch.searchterms}" extend="#{elasticsearch.extend}" />
+						</div>
+						<div id="scene" class="tab-pane" >
+							<ez:elasticSearchOption id="searchinput2" label="Location" idpane="scene"
+							values="#{elasticsearch.searchlocations}" extend="#{elasticsearch.extendlocation}" />
+						</div>
+						<div id="dialogue" class="tab-pane" >
+							<ez:elasticSearchOption id="searchinput3" label="Speaker" idpane="dialogue"
+							values="#{elasticsearch.searchspeakers}" extend="#{elasticsearch.extendspeakers}" />
+						</div>
+					</div>
+					<h:selectBooleanCheckbox value="#{elasticsearch.scenesearchenabled}" /> Scene Search Enabled
+    				<br /><br />
+					<h:commandButton value="Start ElasticSearch" >
+        				<f:ajax listener="#{elasticsearch.searcAll(1)}" execute="@form" render="@form :out :out2web :out_tag" />
+    				</h:commandButton>
+						<br />
+						
+						<h:outputText value="#{elasticsearch.setactive}" escape="false" />
+						
+					</h:form>
+				</div>
+			</div>
+			
+		
 		</div>
 		
-		<h:panelGroup id="ssettingss">
-		<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px;" rendered="#{not empty elasticsearch.searchsettings}">
-			<p><h:outputText value="#{elasticsearch.searchsettings}" escape="false"/></p>
-		</h:panelGroup>
-		</h:panelGroup>
-		<div style="float:left; clear: both">
-		<h:graphicImage value="#{resource['theme:img/save.png']}" alt="savebutton" onclick="openSaveForm()" />
-		<h:form id="saveForm" ajaxSubmit="true" styleClass="saveform">
-			<table border="0">
-			<tr>
-			<td>
-				<h:outputText value="#{msgs.save}" />
-			</td>
-    		<td>
-    			<h:inputText value="#{elasticsearch.name}"/> 
-			</td>
-			<td>
-				<h:commandButton value="Save Search">
-	        		<f:ajax listener="#{elasticsearch.saveSearch}" execute="@form" render="@form" />
-	    		</h:commandButton>
-	    	</td>
-	    	<td>	
-	    		<h:commandButton value="Save as New Search"> <!--  rendered="{elasticsearch.nameEmpty}"> -->
-	        		<f:ajax listener="#{elasticsearch.saveNewSearch}" execute="@form" render="@form" />
-	    		</h:commandButton>
-    		</td>
-    		</tr>
-    		</table>
-		</h:form>
-		</div>
+
 		<a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}" alt="ai" />
@@ -64,72 +65,7 @@
         </a4j:status>
 	</ui:define>
 
-	<ui:define name="cotextpanel">
-		<h:panelGroup rendered="#{elasticsearch.user.utente.role != 'student'}">
-		<div class="box-header well">
-			<h2>
-				<i class="icon-list"></i> Co-text Results: Table Concordancing
-			</h2>
-			<div class="box-icon">
-				<a href="#" class="btn btn-minimize btn-round"><i id="sbtnc"
-					class="icon-chevron-down"></i></a> <a href="#"
-					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
-			</div>
-		</div>
-		<h:panelGroup id="outcotext">
-		<div class="box-content">
-			<div class="box-content">
-				<ul class="nav nav-tabs" id="myCotextTab">
-					<ui:repeat value="#{elasticsearch.searchterms}" var="result" varStatus="status">
-						<li class="#{status.first?'active':''}"><h:outputLink value="##{result}"><h:outputText value="#{result}" escape="false" /></h:outputLink></li>
-					</ui:repeat>
-					<li><a href="#multiplecotext">All</a></li>
-				</ul>
-				<div id="myCotextTabContent" class="tab-content">
-					<ui:repeat id="cotext2" value="#{elasticsearch.searchterms}" var="result" varStatus="status">
-					<div class="#{status.first?'active':''} tab-pane" id="#{result}">
-						Results for <h:outputText value="#{result}" escape="false" />
-						<table style="width:300px" class="table table-striped table-bordered bootstrap-datatable datatable5">
-							<thead>
-								<tr role="row">
-									<th style="float: right;white-space:nowrap;">Left</th>
-	                				<th style="width:1%;white-space:nowrap;"> </th>
-	                				<th style="float: left;white-space:nowrap;">Right</th>
-								</tr>
-							</thead>
-							<tbody>
-								<h:outputText value="#{elasticsearch.cotext(result)}" escape="false" />
-							</tbody>
-						</table>
-					
-					</div>
-					</ui:repeat>
-					<div class="tab-pane" id="multiplecotext">
-						Results for All
-						<table class="table table-striped table-bordered bootstrap-datatable datatable5">
-							<thead>
-								<tr role="row">
-									<ui:repeat value="#{elasticsearch.searchterms}" var="result">
-										<th></th>
-										<th></th>
-										<th></th>
-										<th></th>
-									</ui:repeat>
-								</tr>
-							</thead>
-							<tbody>
-								<h:outputText value="#{elasticsearch.multiplecotext()}" escape="false" />
-							</tbody>
-						</table>
-					
-					</div>
-					
-				</div>
-			</div>
-		</div>
-		</h:panelGroup>
-		</h:panelGroup>
-	</ui:define>
+
 
 	<ui:define name="searchpanel">
 		<div class="box-header well">
@@ -147,12 +83,10 @@
 
 				<ul class="nav nav-tabs" id="myTab">
 					<li class="active"><a href="#info">Web</a></li>
-					<li><a href="#custom">Video</a></li>
-					<li><a href="#messages">Image</a></li>
 				</ul>
 				
 					<div id="myTabContent" class="tab-content">
-						<h:panelGroup rendered="#{elasticsearch.user.utente.role != 'student'}"><button onclick="openAddStoryButton()" style="float:right;">On/Off Storyboard</button></h:panelGroup>
+						
 						<div class="tab-pane active" id="info">
 				
 				<h:form id="out" ajaxSubmit="true">
@@ -172,13 +106,17 @@
 								<tr>
 									<td>
 									
-	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
+	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a>
+	                						<h:commandLink action="#{elasticsearch.setscene(result.sceneid)}">
+    											<f:ajax render=":scenetranscript" />
+   												<h:outputText value="#{result.scene}"  />
+											</h:commandLink>
+	                						
+	                						
+	                						<br />
 											<h:outputText value="#{result.description}" escape="false" />		
 											<br />
 											
-												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{elasticsearch.addWebRes(result)}" >
-													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
-												</h:commandButton>
 											
 											</td>
 								</tr>
@@ -189,7 +127,9 @@
 							<!--  /ul -->
 						</tbody>
 					</table>
+
 					<script>
+					
 					/* <![CDATA[ */
    				function sortab(data) {
    				    if (data.status === 'success') {
@@ -234,6 +174,9 @@
 							
 				<!--  /h:panelGroup -->
 			</h:form>
+								<h:panelGroup id="scenetranscript">
+					<h:outputText value="#{elasticsearch.scenepopup}" escape="false" />
+					</h:panelGroup>
 			<h:form> 
     			<a4j:jsFunction name="orderList"  action="#{elasticsearch.reorderList}">
     				<a4j:param name="data" assignTo="#{elasticsearch.storydata}" />
@@ -247,62 +190,6 @@
  			</h:form>
 				</div>
 				
-					<div class="tab-pane" id="custom">
-					<h:panelGroup id="outvideo">
-					<table
-						class="table table-striped table-bordered bootstrap-datatable datatable2">
-						<thead>
-							<tr>
-								<th>Results for Videos</th>
-							</tr>
-						</thead>
-						<tbody>
-							<ui:repeat id="resultstable2" value="#{elasticsearch.searchResult2}"
-								var="result" rendered="#{not empty elasticsearch.searchResult2}">
-								<tr>
-									<td>
-										<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
-										<h:graphicImage url="#{result.thumbnail.mediaUrl}" width="#{result.thumbnail.width}" height="#{result.thumbnail.height}" />
-										<h:outputText value="#{result.runtime}" escape="false" />
-										<br />
-												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{elasticsearch.addVideoRes(result)}" >
-													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
-												</h:commandButton>
-	            					</td>
-								</tr>
-							</ui:repeat>
-						</tbody>
-					</table>
-					
-								
-				</h:panelGroup>
-					</div>
-					<div class="tab-pane" id="messages">
-						<h:panelGroup id="outimages">
-					<table	class="table table-striped table-bordered bootstrap-datatable datatable3">
-						<thead>
-							<tr>
-								<th>Results for Images</th>
-							</tr>
-						</thead>
-						<tbody>
-							<ui:repeat id="resultstable3" value="#{elasticsearch.searchResult3}" var="result" rendered="#{not empty elasticsearch.searchResult3}">
-								<tr>
-									<td>
-	                						<a target="_blank" href="#{result.url}"><h:outputText value="#{result.title}" /></a><br />
-											<h:graphicImage url="#{result.url}" width="100" />
-											<br />
-												<h:commandButton styleClass="addstorybutton" value="Add to Storyboard" action="#{elasticsearch.addImgRes(result)}" > 
-													<f:ajax execute="@form" render=":sblist" onevent="sortab" />
-												</h:commandButton>
-	            					</td>
-								</tr>
-							</ui:repeat>
-						</tbody>
-					</table>
-				</h:panelGroup>
-							
-					</div>
 				</div>
 			</div>
 		</div>
@@ -310,7 +197,7 @@
 	<ui:define name="chartpanel1">
 		<div class="box-header well">
 			<h2>
-				<i class="icon-th"></i> Web Chart Panel
+				<i class="icon-th"></i> Concept Cloud Panel
 			</h2>
 			<div class="box-icon">
 				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn1" class="icon-chevron-down"></i></a> 
@@ -319,405 +206,35 @@
 		</div>
 		<div class="box-content" id="minchartbtn1">
 			<div class="box-content">
+			
 				<ul class="nav nav-tabs" id="myTab">
-					<li class="active"><a href="#info2">Pie</a></li>
-					<li><a href="#webweighted">Weighted Pie</a></li>
-					<li><a href="#weblang">Domain Pie</a></li>
-					<li><a href="#webbar">Bar</a></li>
+					<li class="active"><a href="#info2">Concept Cloud</a></li>
 				</ul>
-				
-				<div id="myTabContent2" class="tab-content">
-				<div class="tab-pane active" id="info2">
-							<h3>
-								<small>Pie Chart</small>
-							</h3>
-							
-								<div id="colo1" style="float: left; width: 400px">
-									<div id="chartpie1" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colo2" style="float: left; width: 400px">
-									<div id="listofsite1" style="height: 300px">
-										<h:form id="checkform1" ajaxSubmit="true">
-										<p id="showInteractive1">value</p><br />
-										<h:commandButton value="Refine Search" action="#{elasticsearch.refineWebSearch('REFINE_PIE')}">
-											<f:ajax execute="@form" render="@form :out :out2web :checkform1L :checkform1W" />
-    									</h:commandButton>
-    									
-										<h:selectManyCheckbox layout="pageDirection" value="#{elasticsearch.siteSelectedlist1}">
-											<f:selectItems value="#{elasticsearch.siteAvailablelist1}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />							
-										</h:selectManyCheckbox>
-										
-										</h:form>
-									</div>
-								</div>
-								<script>
-								/* <![CDATA[ */
-   								function convertPie() {
-   	   								alert('convert Pie');
-								}
-   								/* ]]> */
-   								</script>
-						</div>
-						<div class="tab-pane" id="webweighted">
-							<h3>
-								<small>Weighted Pie Chart</small>
-							</h3>
-							<div>
-								<div id="colo1W" style="float: left; width: 400px">
-									<div id="chartweightedpie1" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colo2W" style="float: left; width: 400px">
-									<div id="listofsite1W" style="height: 300px">
-										<h:form id="checkform1W" ajaxSubmit="true">
-										<p id="showInteractive1W">value</p><br />
-										<h:commandButton value="Refine Search" action="#{elasticsearch.refineWebSearch('REFINE_WEIGHTED_PIE')}">
-											<f:ajax execute="@form" render="@form :out :out2web :checkform1L :checkform1" />
-    									</h:commandButton>
-    									
-										<h:selectManyCheckbox layout="pageDirection" value="#{elasticsearch.siteSelectedlist1}">
-											<f:selectItems value="#{elasticsearch.siteAvailablelist1}" var="i" itemLabel="&lt;a target=_blank class='hasmenu' href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
-										</h:selectManyCheckbox>
-										
-										</h:form>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane" id="weblang">
-							<h3>
-								<small>Domain Pie Chart</small>
-							</h3>
-							<div>
-								<div id="colo1L" style="float: left; width: 400px">
-									<div id="chartlangpie1" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colo2L" style="float: left; width: 400px">
-									<div id="listofsite1L" style="height: 300px">
-										<h:form id="checkform1L" ajaxSubmit="true">
-										<p id="showInteractive1L">value</p><br />
-										<h:commandButton value="Refine Search" action="#{elasticsearch.refineWebSearch('REFINE_DOMAIN_PIE')}">
-											<f:ajax execute="@form" render="@form :out :out2web :checkform1W :checkform1" />
-    									</h:commandButton>
-										<h:selectManyCheckbox value="#{elasticsearch.siteSelectedDomainlist1}">
-											<f:selectItems value="#{elasticsearch.siteAvailableDomainlist1}" var="i" itemLabel="#{i}"  escape="false" />											
-										</h:selectManyCheckbox>
-										</h:form>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane" id="webbar">
-							<h3>
-								<small>Bar Chart</small>
-							</h3>
-							<div>
-								<div id="colobar1" style="float: left; width: 400px">
-									<div id="chartbar1" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colobar2" style="float: left; width: 400px">
-									<div id="listofsite1" style="height: 300px">
-										<p id="showInteractive1Bar">value</p><br />
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-	</ui:define>
-	<ui:define name="chartpanel2">
-		<div class="box-header well">
-			<h2>
-				<i class="icon-th"></i> Video Chart Panel
-			</h2>
-			<div class="box-icon">
-				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn2"
-					class="icon-chevron-down"></i></a> <a href="#"
-					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
-			</div>
-		</div>
-		<div class="box-content" id="minchartbtn2">
-			<div class="box-content">
-				
-					<div id="myTabContent2" class="tab-content">
-						<div class="tab-pane active" id="info2">
-							<h3>
-								<small>Pie Chart</small>
-							</h3>
-							<div>
-								<div id="colo3" style="float: left; width: 400px">
-									<div id="chartpie2" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colo4" style="float: left; width: 400px">
-									<div id="listofsite2" style="height: 300px">
-										<h:form id="checkform2" ajaxSubmit="true">
-										<p id="showInteractive2">value</p><br />
-										<h:commandButton value="Refine Search">
-											<f:ajax execute="@form" render="@form :outvideo :out2video" listener="#{elasticsearch.refineVideoSearch}" />
-    									</h:commandButton>
-										<h:selectManyCheckbox layout="pageDirection" value="#{elasticsearch.siteSelectedlist2}">
-											<f:selectItems value="#{elasticsearch.siteAvailablelist2}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
-										</h:selectManyCheckbox>
-										</h:form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-			</div>
-		</div>
-	</ui:define>
-	<ui:define name="chartpanel3">
-		<div class="box-header well">
-			<h2>
-				<i class="icon-th"></i> Image Chart Panel
-			</h2>
-			<div class="box-icon">
-				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn3"
-					class="icon-chevron-down"></i></a> <a href="#"
-					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
-			</div>
-		</div>
-		<div class="box-content" id="minchartbtn3">
-			<div class="box-content">
-				
-					<div id="myTabContent3" class="tab-content">
-						<div class="tab-pane active" id="info3">
-							<h3>
-								<small>Pie Chart</small>
-							</h3>
-							<div>
-								<div id="colo5" style="float: left; width: 400px">
-									<div id="chartpie3" style="width: 300px; height: 250px"></div>	
-								</div>
-								<div id="colo6" style="float: left; width: 400px">
-									<div id="listofsite3" style="height: 300px">
-										<h:form id="checkform3" ajaxSubmit="true">
-										<p id="showInteractive3">value</p><br />
-										<h:commandButton value="Refine Search">
-											<f:ajax execute="@form" render="@form :outimages :out2img" listener="#{elasticsearch.refineImgSearch}" />
-    									</h:commandButton>
-										<h:selectManyCheckbox layout="pageDirection" value="#{elasticsearch.siteSelectedlist3}">
-											<f:selectItems value="#{elasticsearch.siteAvailablelist3}" var="i" itemLabel="&lt;a target=_blank href=http://#{i}&gt;#{i} &lt;/a&gt;"  escape="false" />											
-										</h:selectManyCheckbox>
-										</h:form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				
-			</div>
-		</div>
-	</ui:define>
-	<ui:define name="storyboard">
-		<div class="box-header well">
-			<h2>
-				<i class="icon-list"></i> Storyboard
-			</h2>
-			<div class="box-icon">
-				<a href="#" class="btn btn-minimize btn-round"><i id="tltn"
-					class="icon-chevron-down"></i></a> <a href="#"
-					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
-			</div>
-		</div>
-		<div class="box-content" id="minstoryboardbtn">
-			<div class="box-content" style="height: 225px" >
- 				<h:panelGroup id="sblist">
-					<div class="column" id="col1">
-		 				<ui:repeat value="#{elasticsearch.storyboardlist}" var="result" rendered="#{not empty elasticsearch.storyboardlist}">
-							<div class="portlet" id="widget_#{result.pos}">
-						    	<div class="portlet-header" style="height: 50px;overflow:hidden;">
-						    	<table>
-						    	<tr>
-						    	<td>
-						    	<h:outputText value="#{result.title}" escape="false" />
-						    	</td><td>
-						    	<h:commandButton value="x" action="#{elasticsearch.RemoveWebRes(result)}" onclick="if (!confirm('Do you really want to remove this item?')) return false">
-									<f:ajax execute="@form" render=":sblist" onevent="sortab" />
-								</h:commandButton>
-								</td>
-								</tr>
-								</table>
-						    	</div>
-						    	<div class="portlet-content"><div id="wrapper-frame"><h:outputText value="#{result.webcontent}" escape="false" /></div></div>
-						  	</div>
-						</ui:repeat>
- 					</div>
- 					
+				<h:panelGroup id="out_tag">
+						<div id="demoen" style="height: 500px;"></div>			
 				</h:panelGroup>
+				
 				</div>
-				<div style="clear: both"></div>
- 					<h:graphicImage value="#{resource['theme:img/save.png']}" alt="savestoryboardbutton" onclick="openSaveForm()" />
- 					<h:form id="saveStoryBoard" ajaxSubmit="true" styleClass="saveform">
-				<table border="0">
-					<tr>
-						<td>
-							<h:outputText value="#{msgs.storyboard}" />
-						</td>
-    					<td>
-    						<h:inputText value="#{elasticsearch.storybname}" /> 
-						</td>
-						<td>
-							<h:commandButton value="Save Storyboard">
-	        					<f:ajax listener="#{elasticsearch.saveStoryboard}" execute="@form" render="@form" />
-	    					</h:commandButton>
-	    				</td>
-	    				<td>
-	    					<h:commandButton value="Save as New Storyboard"> 
-	        					<f:ajax listener="#{elasticsearch.saveNewStoryboard}" execute="@form" render="@form" />
-	    					</h:commandButton>
-	    				</td>
-    				</tr>
-    			</table>
-			</h:form>
-			
-			<h:graphicImage value="#{resource['theme:img/open.png']}" width="24" alt="openstoryboardbutton" onclick="openOpenForm()" />
- 			<h:form id="oStoryBoard" ajaxSubmit="true" styleClass="openform">
-				<table border="0">
-					<tr>
-						<td>
-							<h:outputText value="#{msgs.ostoryboard}" />
-						</td>
-    					<td>
-    						<h:selectOneMenu value="#{elasticsearch.storyboardsel}">
-   								<f:selectItems value="#{elasticsearch.userStoryboards}" var="c" itemLabel="#{c.nome}" itemValue="#{c.id}" />
-   							</h:selectOneMenu> 
-						</td>
-						<td>
-							<h:commandButton value="Open Storyboard" >
-								<f:ajax execute="@form" render="@form :sblist :saveStoryBoard" listener="#{elasticsearch.openStoryboard}" onevent="sortab" />
-    						</h:commandButton>
-	    				</td>
-    				</tr>
-    			</table>
-			</h:form>				
-			
-		</div>
+			</div>
 	</ui:define>
 	
-	<ui:define name="timelinepanel">
-		<div class="box-header well">
-			<h2>
-				<i class="icon-list"></i> Timeline
-			</h2>
-			<div class="box-icon">
-				<a href="#" class="btn btn-minimize btn-round"><i id="tltn"
-					class="icon-chevron-down"></i></a> <a href="#"
-					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
-			</div>
-		</div>
-		<div class="box-content" id="mintimelinebtn">
-			<div class="box-content" style="height: 225px">
-				<div id="timeline" style="width: 50%"></div>
-			</div>
-		</div>
-	</ui:define>
 
 	<ui:define name="piechartdata">
-		<script>
-			var timeline = new VMM.Timeline();
-			timeline.init('{"timeline":{"headline":"Starting","startDate":"2013,01","text":"Starting Point","asset":{"caption":"","credit":"","media":"aaa"},"date":[],"type":"default"}}');
-		</script>
 		<h:panelGroup id="contextmenuscript">
-		<script>
-				
-				$("#listofsite1").contextmenu({
-				    delegate: ".hasmenu",
-				    menu: [
-				        {title: "Add to...", children: [ 
-							<h:outputText value="#{elasticsearch.contextmenuchild}" escape="false" />    				        
-				            
-				            ]}
-				        ],
-				    select: function(event, ui) {
-				    	if (ui.cmd!='')
-				    		addToSiteSetting(ui.cmd,ui.target.text());
-				        // alert("select " + ui.cmd + " on " + ui.target.text());
-				    }
-				});
-				$("#listofsite1W").contextmenu({
-				    delegate: ".hasmenu",
-				    menu: [
-				        {title: "Add to...", children: [
-							<h:outputText value="#{elasticsearch.contextmenuchild}" escape="false" />
-				            ]}
-				        ],
-				    select: function(event, ui) {
-					    if (ui.cmd!='')
-				    		addToSiteSetting(ui.cmd,ui.target.text());
-				    }
-				});
-			 </script>
+
 		</h:panelGroup>
 		<h:panelGroup id="out2web"> 
 			<script>
-				<h:outputText value="#{elasticsearch.searchDataPie1}" escape="false" />
-				<h:outputText value="#{elasticsearch.searchLangDataPie1}" escape="false" />
-				<h:outputText value="#{elasticsearch.searchDataBar1}" escape="false" />
-				<h:outputText value="#{elasticsearch.searchWeightedDataPie1}" escape="false" />
+				<h:outputText value="#{elasticsearch.tagclouddata}" escape="false" />
 			</script>
+		
 			<script type="text/javascript">
 				/* <![CDATA[ */
 				$('.datatable1').dataTable({
-					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
 					"sPaginationType": "bootstrap",
-					"oLanguage": {
-					"sLengthMenu": "_MENU_ records per page"
-					}
-				} );									
-				/* ]]> */
-			</script>
-			<script type="text/javascript">
-				/* <![CDATA[ */
-				//tabs
-				$('#myCotextTab a:first').tab('show');
-				$('#myCotextTab a').click(function (e) {
-				  e.preventDefault();
-				  $(this).tab('show');
-				});
-				
-				$('.datatable5').dataTable({
-					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
-					"sPaginationType": "bootstrap",
-					"oLanguage": {
-					"sLengthMenu": "_MENU_ records per page"
-					}
-				} );	
-				/* ]]> */
-			</script>
-		</h:panelGroup>
-		<h:panelGroup id="out2img">	
-			<script>
-				<h:outputText value="#{elasticsearch.searchDataPie3}" escape="false" />
-			</script>
-			<script type="text/javascript">
-				/* <![CDATA[ */
-				$('.datatable3').dataTable({
-					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
-					"sPaginationType": "bootstrap",
-					"oLanguage": {
-					"sLengthMenu": "_MENU_ records per page"
-					}
-				} );									
-				/* ]]> */
-			</script>	
-		</h:panelGroup>
-		<h:panelGroup id="out2">
-			<script>
-				<h:outputText value="#{elasticsearch.timeline}" escape="false" />
-			</script>
-		</h:panelGroup>
-		<h:panelGroup id="out2video">			
-			<script>
-				<h:outputText value="#{elasticsearch.searchDataPie2}" escape="false" />
-			</script>
-			<script type="text/javascript">
-				/* <![CDATA[ */
-				$('.datatable2').dataTable({
-					"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span12'i><'span12 center'p>>",
-					"sPaginationType": "bootstrap",
+					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+					"bFilter": false, 
+					"dom": 'lifrtp',
 					"oLanguage": {
 					"sLengthMenu": "_MENU_ records per page"
 					}
@@ -725,6 +242,7 @@
 				/* ]]> */
 			</script>
 		</h:panelGroup>
+
 		<h:panelGroup id="scriptstoryboad">
 		<script type="text/javascript">
 			/* <![CDATA[ */
@@ -742,29 +260,32 @@
    		</script>
 		</h:panelGroup>
 		<script>
-			function openSaveForm(){
-				$(".saveform").toggle();
-			}
-			function openOpenForm(){
-				$(".openform").toggle();
-			}
-			function openAddStoryButton(){
-				$(".addstorybutton").toggle();
-			}
+			
+			var fill = d3.scale.category20();
+		    function drawen(words) {
+		        d3.select("#demoen").append("svg")
+		            .attr("width", 1000)
+		            .attr("height", 500)
+		          .append("g")
+		            .attr("transform", "translate(500,250)")
+		          .selectAll("text")
+		            .data(words)
+		          .enter().append("text")
+		            .style("font-size", function(d) { return d.size + "px"; })
+		            .style("font-family", "Impact")
+		            .style("fill", function(d, i) { return fill(i); })
+		            .attr("text-anchor", "middle")
+		            .attr("transform", function(d) {
+		              return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+		            })
+		            .text(function(d) { return d.text; })
+		            .on("click", function(d) {
+		    			showen(d.text);
+		  			});;
+		      }
+			
 		</script>
-		<script>
-		/* <![CDATA[ */
-		// TO DELETE
-		$(".btntest").click(function (e) {
-		    e.preventDefault();
-		    var text = $("<div class=\"column\"><div class=\"portlet\"><div class=\"portlet-header\">testo</div><div class=\"portlet-content\">Lorem</div></div></div>").val();
-		    // $( "#storybox" ).append("<p>maaaa</p>");
-		    $( "#storybox" ).append("<div class=\"portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\"><div class=\"portlet-header ui-widget-header ui-corner-all\"><span class=\"ui-icon ui-icon-minusthick portlet-toggle\"></span>testo</div><div class=\"portlet-content\">ciao</div></div>");
-		    // alert("aaa");
-		    $( ".column" ).sortable('refresh');
-		});
-		/* ]]> */
-		</script>
+		
 	</ui:define>
 	<ui:define name="modal">
 		
@@ -780,9 +301,7 @@
    				<h:selectOneRadio value="#{elasticsearch.loclistsel}">
    					<f:selectItems value="#{elasticsearch.loclist}" var="item2" itemLabel="#{item2.value}" itemValue="#{item2.id}" />
    				</h:selectOneRadio>
-   				<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{elasticsearch.savelocalesettings}" >
-						<f:ajax execute="@form" render=":ssettingss" onevent="closimi" />
-    				</h:commandButton>
+   				
    				</h:form>
    				<script>
    				function closimi(data) {

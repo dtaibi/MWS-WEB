@@ -30,13 +30,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
-import net.billylieurance.azuresearch.AzureSearchImageQuery;
-import net.billylieurance.azuresearch.AzureSearchImageResult;
-import net.billylieurance.azuresearch.AzureSearchResultSet;
-import net.billylieurance.azuresearch.AzureSearchVideoQuery;
-import net.billylieurance.azuresearch.AzureSearchVideoResult;
-import net.billylieurance.azuresearch.AzureSearchWebQuery;
-import net.billylieurance.azuresearch.AzureSearchWebResult;
 import net.billylieurance.azuresearch.BingThumbnail;
 
 import org.json.JSONArray;
@@ -52,7 +45,6 @@ import de.unihannover.l3s.mws.dao.RicercaDao;
 import de.unihannover.l3s.mws.dao.SiteSetDao;
 import de.unihannover.l3s.mws.dao.StoryboardDao;
 import de.unihannover.l3s.mws.dao.TrackDao;
-import de.unihannover.l3s.mws.dao.UrlContentDao;
 import de.unihannover.l3s.mws.dao.UtenteDao;
 import de.unihannover.l3s.mws.model.Generalsettings;
 import de.unihannover.l3s.mws.model.Ricerca;
@@ -89,8 +81,15 @@ public class ElasticSearch {
 	// private ArrayList<String> siteAvailablelist=null;
 	// private List<String> siteSelectedlist;
 	// private ArrayList<SearchResult> searchResult=null;
+	
+	private boolean scenesearchenabled=false;
+	
 	private String timeline;
 	private List<String> searchterms;
+	private List<String> searchlocations;
+	private List<String> searchspeakers;
+	String setactive="";
+	
 	@ManagedProperty(value="#{user}")
 	private User user;
 
@@ -157,12 +156,18 @@ public class ElasticSearch {
 	
 	private List<String> teasers;
 	
-	public enum Type {
-	    REFINE_PIE,
-	    REFINE_WEIGHTED_PIE,
-	    REFINE_DOMAIN_PIE
-	}
+	private String tagclouddata="";
 	
+	private String scenepopup;
+	
+	public boolean isScenesearchenabled() {
+		return scenesearchenabled;
+	}
+
+	public void setScenesearchenabled(boolean scenesearchenabled) {
+		this.scenesearchenabled = scenesearchenabled;
+	}
+
 	List<StoryboardItem> storyboardlist;
 	
 	public List<StoryboardItem> getStoryboardlist() {
@@ -181,6 +186,16 @@ public class ElasticSearch {
 		this.userStoryboards = userStoryboards;
 	}
 	
+	
+	
+	public String getTagclouddata() {
+		return tagclouddata;
+	}
+
+	public void setTagclouddata(String tagclouddata) {
+		this.tagclouddata = tagclouddata;
+	}
+
 	public Storyboard getStoryboard() {
 		return storyboard;
 	}
@@ -245,6 +260,12 @@ public class ElasticSearch {
         this.teasers = teasers;
     }
 	
+    
+    
+	public String getScenepopup() {
+		return scenepopup;
+	}
+
 	public void addToSiteSetting(){
 		Long sitesetid=Long.parseLong(this.siteSetId);
 		SiteSet ss=null;
@@ -606,9 +627,20 @@ public class ElasticSearch {
 	}
 	
 	
+	
+	public String getSetactive() {
+		return setactive;
+	}
+
+	public void setSetactive(String setactive) {
+		this.setactive = setactive;
+	}
+
 	@PostConstruct
     public void init() {
 		searchterms = new ArrayList<String>();
+		searchlocations=new ArrayList<String>();
+		searchspeakers=new ArrayList<String>();
 		siteAvailablelist1 = new ArrayList<String>();
 		siteAvailablelist2 = new ArrayList<String>();
 		siteAvailablelist3 = new ArrayList<String>();
@@ -618,6 +650,8 @@ public class ElasticSearch {
 		siteSelectedlist2 = new ArrayList<String>();
 		siteSelectedlist3 = new ArrayList<String>();
 		searchterms.add("");
+		searchlocations.add("");
+		searchspeakers.add("");
 		
 		Set<Generalsettings> gensets=this.user.getUtente().getGeneralsettings();
 		excludeWeb = new ArrayList<String>();
@@ -738,8 +772,19 @@ public class ElasticSearch {
 	
     public void extend() {
     	searchterms.add("");
+    	setactive="<script>document.getElementById(\"word\").classList.add('active');</script>";
     }
 	
+    public void extendlocation() {
+    	searchlocations.add("");
+    	setactive="<script>document.getElementById(\"scene\").classList.add('active');</script>";
+    }
+    
+    public void extendspeakers() {
+    	searchspeakers.add("");
+    	setactive="<script>document.getElementById(\"dialogue\").classList.add('active');</script>";
+    }
+    
     public <T> List<T> intersection(List<T> list1, List<T> list2) {
         List<T> list = new ArrayList<T>();
 
@@ -762,8 +807,22 @@ public class ElasticSearch {
 		this.searchterms = searchterms;
 	}
 
-	
+    public List<String> getSearchlocations() {
+		return searchlocations;
+	}
 
+	public void setSearchlocations(List<String> searchlocations) {
+		this.searchlocations = searchlocations;
+	}
+
+    public List<String> getSearchspeakers() {
+		return searchspeakers;
+	}
+
+	public void setSearchspeakers(List<String> searchspeakers) {
+		this.searchspeakers = searchspeakers;
+	}
+	
 	public User getUser() {
 		return user;
 	}
@@ -1358,295 +1417,46 @@ public class ElasticSearch {
         return tldString;
     }
 	
-	public void refineWebSearch(Type type){
-		System.out.println("TYPE: REFINE Web ");
-		
-		//String accountKey = "BmbX+6Sy9/VEcS5oOjurccO5MQpKr2ewvLQ2vRHBKXQ";
-		// TextManager tmgr=new TextManager();
-		
-		searchterms.removeAll(Collections.singleton(""));
-		String q="";
-		for (String t : this.searchterms){
-			q+="\""+t+"\" ";
+	
+	private int countOcc(String str, String findStr){
+		str=str.toLowerCase();
+		findStr=findStr.toLowerCase();
+		int lastIndex = 0;
+		int count = 0;
+
+		while(lastIndex != -1){
+
+		    lastIndex = str.indexOf(findStr,lastIndex);
+
+		    if(lastIndex != -1){
+		        count ++;
+		        lastIndex += findStr.length();
+		    }
 		}
-		
-		if (type == Type.REFINE_DOMAIN_PIE){
-			List<String> excludedomain=new ArrayList<String>(siteAvailableDomainlist1);
-			excludedomain.removeAll(siteSelectedDomainlist1);
-			List<String> excludelist=new ArrayList<String>();
-			for (String s:siteSelectedlist1)
-				if (excludedomain.contains(getTldString("http://"+s)))
-					excludelist.add(s);
-			
-			List<String> includelist=new ArrayList<String>();
-			for (String s:siteAvailablelist1)
-				if (!excludedomain.contains(getTldString("http://"+s)))
-					includelist.add(s); 
-			
-			siteSelectedlist1.removeAll(excludelist);
-			siteSelectedlist1.addAll(includelist);
-		}
-		
-		List<String> exclude=new ArrayList<String>(siteAvailablelist1);
-		exclude.removeAll(siteSelectedlist1);
-		exclude.addAll(excludeWeb);
-		
-		for (String s : exclude)
-			q+=" -site:"+s+" ";
-		
-		System.out.println(q);
-		Track track=new Track();
-		track.setDate((new GregorianCalendar()).getTime());
-		track.setOperation("search");
-		track.setParam1(q);
-		track.setParam2(type.name());
-		track.setParam3("1");
-		track.setUtente(this.user.getUtente());
-		TrackDao td=new TrackDao();
-		td.addTrack(track);
-		
-		List<SearchResult> toremove=new ArrayList<SearchResult>();
-		searchResult1 = new ArrayList<SearchResult>(searchResultWeb);
-		for (SearchResult res:searchResult1){
-			for (String exc : exclude)
-				if (res.getUrl().contains(exc)) { // || excludedomain.contains(this.getTldString(res.getUrl()))){
-					System.out.println("removing "+exc);
-					toremove.add(res);
-				}
-		}
-		
-		for (SearchResult sr : toremove){
-			searchResult1.remove(sr);
-		}
-		
-		if (searchterms.size()==0) searchterms.add("");
-		
-		// PIE WEB
-		StatsManager sm=new StatsManager();
-		List<YData> list=sm.getMatcthTable(sm.getSites(searchResult1, null, null));
-		searchDataPie1="var data = [ "; 
-		List<String> datastring=new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-		}
-		searchDataPie1+=Joiner.on(",").join(datastring);
-		searchDataPie1+=" ]; ";
-		searchDataPie1+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie1+="$.plot($(\"#chartpie1\"), data, options ); \n";
-		String hover=" $(\"#chartpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		hover=" $(\"#chartpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		searchDataPie1+=hover;  
-		searchDataPie1+=" var choiceContainer = $(\"#chartpie1\");";
-		searchDataPie1+=" choiceContainer.find(\"input\").click(plotAccordingToChoices);";
-		searchDataPie1+=" function plotAccordingToChoices() { ";
-		searchDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie1+=" }";
-		searchDataPie1+="  ";
-		// return "basicSearch";
-		
-		List<YData> wlist=sm.getMatcthWeightedTable(sm.getSites(searchResult1, null, null));
-		searchWeightedDataPie1="var weighteddata = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : wlist){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-		}
-		searchWeightedDataPie1+=Joiner.on(",").join(datastring);
-		searchWeightedDataPie1+=" ]; ";
-		searchWeightedDataPie1+="$.plot($(\"#chartweightedpie1\"), weighteddata, options ); \n";
-		String hoverW=" $(\"#chartweightedpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1W\").html(html.join('')); }); ";
-		searchWeightedDataPie1+=hoverW;  
-		searchWeightedDataPie1+=" var choiceContainerW = $(\"#chartweightedpie1\");";
-		searchWeightedDataPie1+=" choiceContainerW.find(\"input\").click(plotAccordingToChoicesW);";
-		searchWeightedDataPie1+=" function plotAccordingToChoicesW() { ";
-		searchWeightedDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchWeightedDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchWeightedDataPie1+=" }";
-		searchWeightedDataPie1+="  ";
-		
-		List<YData> Llist=sm.getMatcthTable(sm.getLangSites(searchResult1, null, null));
-		searchLangDataPie1="var langdata = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : Llist){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");		
-		}
-		searchLangDataPie1+=Joiner.on(",").join(datastring);
-		searchLangDataPie1+=" ]; ";
-		searchLangDataPie1+="$.plot($(\"#chartlangpie1\"), langdata, options ); \n";
-		String hoverL=" $(\"#chartlangpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1L\").html(html.join('')); }); ";
-		searchLangDataPie1+=hoverL;  
-		searchLangDataPie1+=" var choiceContainerL = $(\"#chartlangpie1\");";
-		searchLangDataPie1+=" choiceContainerL.find(\"input\").click(plotAccordingToChoicesL);";
-		searchLangDataPie1+=" function plotAccordingToChoicesL() { ";
-		searchLangDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchLangDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchLangDataPie1+=" }";
-		searchLangDataPie1+="  ";
-		
-		alignSiteDomain();
+		return count;
+	}
+
+	public void setscene(String sceneid){
+		scenepopup=scene_transcript.get(sceneid).replace("\n", "<br />");
 	}
 	
-	public String refineImgSearch(){
-		// System.out.println("TYPE: REFINE IMG ");
-
-		
-		searchterms.removeAll(Collections.singleton(""));
-		String q="";
-		for (String t : this.searchterms){
-			q+="\""+t+"\" ";
-		}
-		
-		List<String> exclude=new ArrayList<String>(siteAvailablelist3);
-		exclude.removeAll(siteSelectedlist3);
-		exclude.addAll(excludeImg);
-		for (String s : exclude)
-			q+=" -site:"+s+" ";
-		
-		
-		
-		System.out.println(q);
-		Track track=new Track();
-		track.setDate((new GregorianCalendar()).getTime());
-		track.setOperation("search");
-		track.setParam1(q);
-		track.setParam2("Refine IMG");
-		track.setParam3("1");
-		track.setUtente(this.user.getUtente());
-		TrackDao td=new TrackDao();
-		td.addTrack(track);
-		
-		List<SearchResult> toremove=new ArrayList<SearchResult>();
-		searchResult3 = new ArrayList<SearchResult>(searchResultImg);
-		for (SearchResult res:searchResult3){
-			for (String exc : exclude)
-				if (res.getUrl().contains(exc)){
-					// System.out.println("removing "+exc);
-					toremove.add(res);
-				}
-		}
-		
-		for (SearchResult sr : toremove){
-			searchResult3.remove(sr);
-		}
-		
-		if (searchterms.size()==0) searchterms.add("");
-		// PIE IMAGE		
-		StatsManager sm=new StatsManager();
-		List<YData> list = sm.getMatcthTable(sm.getSites(searchResult3, null, null));
-		searchDataPie3="var data = [ "; 
-		ArrayList<String> datastring = new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-		}
-		searchDataPie3+=Joiner.on(",").join(datastring);
-		searchDataPie3+=" ]; ";
-		// searchDataPie3+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie3+="$.plot($(\"#chartpie3\"), data, options ); \n";
-		String hover=" $(\"#chartpie3\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		hover=" $(\"#chartpie3\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		searchDataPie3+=hover;  
-		searchDataPie3+=" var choiceContainer3 = $(\"#chartpie3\");";
-		searchDataPie3+=" choiceContainer3.find(\"input\").click(plotAccordingToChoices3);";
-		searchDataPie3+=" function plotAccordingToChoices3() { ";
-		searchDataPie3+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie3+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie3+=" }";
-		searchDataPie3+="  ";
-		return "basicSearch";
-	}
-	
-public String refineVideoSearch(){
-		
-		
-		// System.out.println("TYPE: REFINE Video nuovo: ");
-		
-		//String accountKey = "BmbX+6Sy9/VEcS5oOjurccO5MQpKr2ewvLQ2vRHBKXQ";
-		// TextManager tmgr=new TextManager();
-		
-		searchterms.removeAll(Collections.singleton(""));
-		String q="";
-		for (String t : this.searchterms){
-			q+="\""+t+"\" ";
-		}
-		
-		List<String> exclude=new ArrayList<String>(siteAvailablelist2);
-		exclude.removeAll(siteSelectedlist2);
-		exclude.addAll(excludeVid);
-		for (String s : exclude)
-			q+=" -site:"+s+" ";
-		
-		
-		System.out.println(q);
-		Track track=new Track();
-		track.setDate((new GregorianCalendar()).getTime());
-		track.setOperation("search");
-		track.setParam1(q);
-		track.setParam2("Refine Video");
-		track.setParam3("1");
-		track.setUtente(this.user.getUtente());
-		TrackDao td=new TrackDao();
-		td.addTrack(track);
-		
-		List<SearchResult> toremove=new ArrayList<SearchResult>();
-		searchResult2 = new ArrayList<SearchResult>(searchResultVideo);
-		for (SearchResult res:searchResult2){
-			for (String exc : exclude)
-				if (res.getUrl().contains(exc)){
-					System.out.println("removing "+exc);
-					toremove.add(res);
-				}
-		}
-		
-		for (SearchResult sr : toremove){
-			searchResult2.remove(sr);
-		}
-
-		if (searchterms.size()==0) searchterms.add("");
-		// PIE VIDEO		
-		StatsManager sm=new StatsManager();
-		List<YData> list = sm.getMatcthTable(sm.getSites(searchResult2, null, null));
-		searchDataPie2="var data = [ "; 
-		ArrayList<String> datastring = new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-			// siteAvailablelist2.add(a.getSite());
-			// siteSelectedlist2.add(a.getSite());
-		}
-		searchDataPie2+=Joiner.on(",").join(datastring);
-		searchDataPie2+=" ]; ";
-		// searchDataPie2+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie2+="$.plot($(\"#chartpie2\"), data, options ); \n";
-		String hover=" $(\"#chartpie2\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		hover=" $(\"#chartpie2\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive\").html(html.join('')); }); ";
-		searchDataPie2+=hover;  
-		searchDataPie2+=" var choiceContainer2 = $(\"#chartpie2\");";
-		searchDataPie2+=" choiceContainer2.find(\"input\").click(plotAccordingToChoices2);";
-		searchDataPie2+=" function plotAccordingToChoices2() { ";
-		searchDataPie2+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie2+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie2+=" }";
-		searchDataPie2+="  ";
-		
-		
-		
-		return "basicSearch";
-		
-		
-		
-	}
+	Map<String,String> scene_transcript=new HashMap<String,String>();
 	
 	public String searcAll(int nuovo) throws IOException{
 		
 		
-		
+		scenepopup="";
 		
 		TextManager tmgr=new TextManager();
 		tmgr.setCotextrange(this.user.getUtente().getCotextrange());
 		searchterms.removeAll(Collections.singleton(""));
 		String q="";
-		for (String t : this.searchterms){
-			// q+="\""+t+"\" ";
-			q+=t+" ";
+		if (searchterms.size()>0) {
+			q=searchterms.get(0);
+			q="%22"+q.replace(" ", "%20")+"%22";
+		}
+		for (int i=1;i<searchterms.size();i++){
+				q+="%20AND%20%22"+searchterms.get(i).replace(" ", "%20")+"%22";
 		}
 		
 		if (nuovo==1){
@@ -1658,7 +1468,7 @@ public String refineVideoSearch(){
 			siteSelectedlist3.clear();
 		}
 		
-		if (!(this.user.getUtente().hasAllLoc()))
+		/*if (!(this.user.getUtente().hasAllLoc()))
 				for (Generalsettings gs : this.loclist)
 					if (this.loclistsel.compareTo(gs.getId()+"")==0)
 						q+=" loc:"+locMap.get(gs.getValue());
@@ -1675,21 +1485,16 @@ public String refineVideoSearch(){
 			// for (String s : this.langlistsel)
 				for (Generalsettings gs : this.langlist)
 					if (this.langlistsel.compareTo(gs.getId()+"")==0)
-						q+=" language:"+gs.getValue()+" ";
+						q+=" language:"+gs.getValue()+" "; 
 		
-		String qweb="    ";
-		for (SiteSetItem ssi : this.user.getUtente().getSitesetitem()){
-			qweb+= " site:"+ssi.getUrl()+" OR ";
-		}
-		qweb=qweb.substring(0, qweb.length()-4);
-		if (qweb.trim().length()!=0) qweb=" ("+qweb+") ";
+		System.out.println(q);
+		*/
 		
-		q=q+" "+qweb; // ADDED TO HAVE RESTRICTION ALSO ON VIDEOS AND IMAGES 
-		qweb="";
-		System.out.println(q+" "+qweb);
-		
-		
-		ESearch eSearch= new ESearch("http://194.119.209.206:9200/index_2/_search");
+		ESearch eSearch;
+		if (this.scenesearchenabled)
+			eSearch= new ESearch("http://194.119.209.206:9200/asimijaz_drhouse_scenes01/_search");
+		else
+			eSearch= new ESearch("http://194.119.209.206:9200/asimijaz_drhouse_08/_search");
 		
 		int noOfResults=100;
 		
@@ -1700,43 +1505,90 @@ public String refineVideoSearch(){
 		List<String> ripetiz=new ArrayList<String>();
 		UrlContent obj1 = new UrlContent();
 		int temp_counter =1;
+		Map<String, Integer> conceptFreq=new HashMap<String,Integer>();
+		// Map<String, Integer> termOccurrences=new HashMap<String,Integer>();
+		/*scenepopup=	"function autoPopup(sceneid) { "
+			  +" var stili = \"top=10, left=10, width=400, height=250, status=no, menubar=no, toolbar=no scrollbars=no\";"
+			  +" var testo = window.open(\"\", \"\", stili);"
+			  +" testo.document.write(' &lt;html&gt; '); "
+			  +"testo.document.write(\" &lt;head&gt;\");"
+			  +"testo.document.write('  &lt;title&gt;Scene&lt;/title&gt;');"
+			  +"testo.document.write('  &lt;basefont size=2 face=Tahoma&gt;');"
+			  +"testo.document.write(' &lt;/head&gt;');"
+			  +"testo.document.write('&lt;body topmargin=50&gt;');";*/
+			  
 		for (ESearchDataObject anr : objList){
 				
 				if(temp_counter==1)
 				{
 					obj1.SetUrl(anr.getUrl());
-					System.out.println(obj1.GetUrl());
+					// System.out.println(obj1.GetUrl());
 					obj1.SetContent();
-					System.out.println(obj1.GetContent());
-					UrlContentDao ContentSave = new UrlContentDao();
-					ContentSave.SaveURLContent(obj1); 
+					// System.out.println(obj1.GetContent());
+					//UrlContentDao ContentSave = new UrlContentDao();
+					//ContentSave.SaveURLContent(obj1); 
 					temp_counter++;
 				}
 				SearchWebResult r=new SearchWebResult();
 				r.setTitle(anr.getTitle());
 				// r.setDescription(tmgr.SingleTextToCheck(this.searchterms.get(0), anr.getDescription(), 0));
+				//System.out.println(anr.getTitle());
+				String occurrences="";
+				for (int i=0;i<searchterms.size();i++){
+					//System.out.println(anr.getContent());
+					//System.out.println("OCCORRENZE DI: "+searchterms.get(i)+" = "+(countOcc(anr.getContent(),searchterms.get(i))));
+					// termOccurrences.put(searchterms.get(i), countOcc(anr.getContent(),searchterms.get(i)));
+					occurrences+="<br /><b style=\"color: #87CEEB\">"+searchterms.get(i)+ "</b>: "+countOcc(anr.getContent(),searchterms.get(i));
+				}
 				
-				r.setDescription(tmgr.MultipleTextToCheck(this.searchterms, anr.getContent().substring(0,100), 0));
-				teasers.add(anr.getContent().substring(0,100));
+				r.setDescription(tmgr.MultipleTextToCheck(this.searchterms, anr.getContent().substring(0,100)+"...", 0)+occurrences);
+				
+				String value=anr.getScene();
+				String lastTwo="";
+				if (value != null && value.length() >= 2) {  
+				    lastTwo = value.substring(value.length() - 2);
+				    r.setScene(" - Scene: "+lastTwo);
+					r.setSceneid(anr.getScene());
+				}
+				
+				//scenepopup+=" if (sceneid=="+anr.getScene()+") \n";
+				//scenepopup+=" testo.document.write(\""+anr.getContent().replace("\n", "&lt;br /&gt;")+"\") \n";
+				scene_transcript.put(anr.getScene(), elaborateContent(anr.getContent()));
+				teasers.add(anr.getContent().substring(0,100)+"...");
 				r.setUrl(anr.getUrl());
-				if (!ripetiz.contains(r.getUrl())){
+				//if (!ripetiz.contains(r.getUrl())){
 					ripetiz.add(r.getUrl());
 					searchResultWeb.add(r);
 					
-				}
+				//}
+				if (anr.getEntities()!=null)	
+					for (String key:anr.getEntities()){
+						if (conceptFreq.containsKey(key)){
+							conceptFreq.put(key, conceptFreq.get(key)+1);
+						} else {
+							conceptFreq.put(key,1);
+						}
+					}
+				
 			}
+			  
+			 // scenepopup+="testo.document.write('&lt;/body&gt;'); testo.document.write('&lt;/html&gt;');}";
+
+			 // scenepopup=	"function autoPopup(sceneid) { alert(sceneid); } ";
+			//scenepopup+=	"  alert(sceneid); } ";
+			 
 			searchResult1=new ArrayList<SearchResult>(searchResultWeb);
-		
-			searchResultVideo = new ArrayList<SearchResult>();
 			
+		
+			searchResultVideo = new ArrayList<SearchResult>();			
 			searchResult2=new ArrayList<SearchResult>(searchResultVideo);
 			searchResultImg = new ArrayList<SearchResult>();
 			searchResult3=new ArrayList<SearchResult>(searchResultImg);
 		
 			Track track=new Track();
 	        track.setDate((new GregorianCalendar()).getTime());
-	        track.setOperation("search");
-	        track.setParam1(q+" "+qweb);
+	        track.setOperation("elasticsearch");
+	        track.setParam1(q);
 	        track.setParam2(this.searchtype);
 	        track.setParam3("");
 	        track.setUtente(this.user.getUtente());
@@ -1745,157 +1597,37 @@ public String refineVideoSearch(){
 			
 		if (searchterms.size()==0) searchterms.add("");
 		
-		// PIE WEB
-		StatsManager sm=new StatsManager();
-		List<YData> list=sm.getMatcthTable(sm.getSites(searchResult1, null, null));
-		searchDataPie1="var data = [ "; 
-		List<String> datastring=new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-			if (nuovo==1){
-				siteAvailablelist1.add(a.getSite());
-				siteSelectedlist1.add(a.getSite());
-			}
+		tagclouddata=" var wordsen = [ ";
+		for (String key : conceptFreq.keySet()){
+			Integer size=conceptFreq.get(key); if (size>12) size=12; 
+			tagclouddata+=" { text: \""+key.replace("http://dbpedia.org/resource/", "")+"\", size: "+size*7+"}, ";
+			// System.out.println("en;"+key+";"+conceptFreq.get(key));
 		}
-		searchDataPie1+=Joiner.on(",").join(datastring);
-		searchDataPie1+=" ]; ";
-		searchDataPie1+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie1+="$.plot($(\"#chartpie1\"), data, options ); \n";
-		// String hover=" $(\"#chartpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1\").html(html.join('')); }); ";
-		String hover=" $(\"#chartpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1\").html(html.join('')); }); ";
-		searchDataPie1+=hover;  
-		searchDataPie1+=" var choiceContainer = $(\"#chartpie1\");";
-		searchDataPie1+=" choiceContainer.find(\"input\").click(plotAccordingToChoices);";
-		searchDataPie1+=" function plotAccordingToChoices() { ";
-		searchDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie1+=" }";
-		searchDataPie1+="  ";
-		// calculateTimeline(searchResult);
+		tagclouddata+="]; d3.layout.cloud().size([1000, 500]).words(wordsen).rotate(0).font(\"Impact\").fontSize(function(d) { return d.size; }).on(\"end\", drawen).start();";
 		
-		// PIE WEIGHTED WEB
-		
-		List<YData> wlist=sm.getMatcthWeightedTable(sm.getSites(searchResult1, null, null));
-		searchWeightedDataPie1="var weighteddata = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : wlist){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-		}
-		searchWeightedDataPie1+=Joiner.on(",").join(datastring);
-		searchWeightedDataPie1+=" ]; ";
-		searchWeightedDataPie1+="$.plot($(\"#chartweightedpie1\"), weighteddata, options ); \n";
-		String hoverW=" $(\"#chartweightedpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1W\").html(html.join('')); }); ";
-		searchWeightedDataPie1+=hoverW;  
-		searchWeightedDataPie1+=" var choiceContainerW = $(\"#chartweightedpie1\");";
-		searchWeightedDataPie1+=" choiceContainerW.find(\"input\").click(plotAccordingToChoicesW);";
-		searchWeightedDataPie1+=" function plotAccordingToChoicesW() { ";
-		searchWeightedDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchWeightedDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchWeightedDataPie1+=" }";
-		searchWeightedDataPie1+="  ";
-		
-		// PIE DOMAIN WEB
-		
-		List<YData> Llist=sm.getMatcthTable(sm.getLangSites(searchResult1, null, null));
-		searchLangDataPie1="var langdata = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : Llist){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-			/* if (nuovo==1) {
-				siteAvailableDomainlist1.add(a.getSite());
-				siteSelectedDomainlist1.add(a.getSite());
-			} */
-		}
-		searchLangDataPie1+=Joiner.on(",").join(datastring);
-		searchLangDataPie1+=" ]; ";
-		searchLangDataPie1+="$.plot($(\"#chartlangpie1\"), langdata, options ); \n";
-		String hoverL=" $(\"#chartlangpie1\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive1L\").html(html.join('')); }); ";
-		searchLangDataPie1+=hoverL; 
-		String plotclickL=" $(\"#chartlangpie1\").bind(\"plotclick\", function(event, pos, obj){ if (!obj){return;} }); ";
-		searchLangDataPie1+=plotclickL; 
-		searchLangDataPie1+=" var choiceContainerL = $(\"#chartlangpie1\");";
-		searchLangDataPie1+=" choiceContainerL.find(\"input\").click(plotAccordingToChoicesL);";
-		searchLangDataPie1+=" function plotAccordingToChoicesL() { ";
-		searchLangDataPie1+=" var key = $(this).attr(\"name\"); ";
-		searchLangDataPie1+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchLangDataPie1+=" }";
-		searchLangDataPie1+="  ";
-		alignSiteDomain();
-		
-		// BAR WEB
-		searchDataBar1=" var datawebbar = [ "; 
-		datastring=new ArrayList<String>();
-		int conta2=0;
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: [ ["+conta2+","+a.getQty()+"] ]} ");
-			conta2++;
-		}
-		searchDataBar1+=Joiner.on(",").join(datastring);
-		searchDataBar1+=" ]; ";
-		searchDataBar1+=" var baroptions = { series: { bars: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataBar1+="$.plot($(\"#chartbar1\"), datawebbar, baroptions ); \n";
-		searchDataBar1+="  ";
-		
-		// PIE VIDEO		
-		sm=new StatsManager();
-		list=sm.getMatcthTable(sm.getSites(searchResult2, null, null));
-		searchDataPie2="var data = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-			if (nuovo==1){
-				siteAvailablelist2.add(a.getSite());
-				siteSelectedlist2.add(a.getSite());
-			}
-		}
-		searchDataPie2+=Joiner.on(",").join(datastring);
-		searchDataPie2+=" ]; ";
-		// searchDataPie2+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie2+="$.plot($(\"#chartpie2\"), data, options ); \n";
-		// hover=" $(\"#chartpie2\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive2\").html(html.join('')); }); ";
-		hover=" $(\"#chartpie2\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive2\").html(html.join('')); }); ";
-		searchDataPie2+=hover;  
-		searchDataPie2+=" var choiceContainer2 = $(\"#chartpie2\");";
-		searchDataPie2+=" choiceContainer2.find(\"input\").click(plotAccordingToChoices2);";
-		searchDataPie2+=" function plotAccordingToChoices2() { ";
-		searchDataPie2+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie2+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie2+=" }";
-		searchDataPie2+="  ";
-		
-		// PIE IMAGE		
-		sm=new StatsManager();
-		list=sm.getMatcthTable(sm.getSites(searchResult3, null, null));
-		searchDataPie3="var data = [ "; 
-		datastring=new ArrayList<String>();
-		for (YData a : list){
-			datastring.add("{ label: \""+a.getSite()+"\", data: "+a.getQty()+"} ");
-			if (nuovo==1){
-				siteAvailablelist3.add(a.getSite());
-				siteSelectedlist3.add(a.getSite());
-			}
-		}
-		searchDataPie3+=Joiner.on(",").join(datastring);
-		searchDataPie3+=" ]; ";
-		// searchDataPie3+=" var options = { series: { pie: {show: true, label: {show: false} }  }, grid: { hoverable: true, clickable: true }, legend: {show: false} }; ";
-		searchDataPie3+="$.plot($(\"#chartpie3\"), data, options ); \n";
-		// hover=" $(\"#chartpie3\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black;background-color:\", obj.series.color, \"\\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive3\").html(html.join('')); }); ";
-		hover=" $(\"#chartpie3\").bind(\"plothover\", function(event, pos, obj){ if (!obj){return;} percent = parseFloat(obj.series.percent).toFixed(2); var html = []; html.push(\"<div style=\\\"flot:left;width:105px;height:20px;text-align:center;border:0px solid black; \\\">\", \"<span style=\\\"font-weight:bold;color:red\\\">\", obj.series.label, \" (\", percent, \"%)</span>\", \"</div>\"); $(\"#showInteractive3\").html(html.join('')); }); ";
-		searchDataPie3+=hover;  
-		searchDataPie3+=" var choiceContainer3 = $(\"#chartpie3\");";
-		searchDataPie3+=" choiceContainer3.find(\"input\").click(plotAccordingToChoices3);";
-		searchDataPie3+=" function plotAccordingToChoices3() { ";
-		searchDataPie3+=" var key = $(this).attr(\"name\"); ";
-		searchDataPie3+=" $( \"input[value*='\"+key+\"']\" ).trigger('click'); ";
-		searchDataPie3+=" }";
-		searchDataPie3+="  ";
-		// System.out.println("IMAGES: "+searchResult3.size());
-		
-		return "basicSearch";
-		
-		
+
+		return "elasticSearch";		
 		
 	}
 	
+	private String elaborateContent(String transcript) {
+		String[] rows = transcript.split("\n");
+		List<String> rows_new=new ArrayList<String>();
+		String row1="", row2="";
+		// System.out.println("ROWS"+rows.length);
+		// System.out.println("Transcript"+transcript);
+		for (String row : rows){
+			row1=row;row2="";
+			if (row.indexOf(":")!=-1){
+				row1="<b>"+row.substring(0, row.indexOf(":")+1).toUpperCase()+"</b>";
+				row2=row.substring(row.indexOf(":")+1);
+				for (String searchterm : this.searchterms){
+					row2=row2.replace(searchterm, "<span style=\"color: #FF0000;\">"+searchterm+"</span>");
+				}
+			}
+			rows_new.add(row1+" "+row2);
+		}
+		return String.join("\n", rows_new);
+	}
 	
 }

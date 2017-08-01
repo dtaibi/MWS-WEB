@@ -258,9 +258,11 @@ public class EntityExtractionService {
 	            jsonString.append(line);
                 jsonString.append("\n");
 	        }
-	//        System.out.println(jsonString);
+	        // System.out.println(jsonString);
 	        br.close();
-		    
+	        DandelioncacheDao dandedao=new DandelioncacheDao();
+	        dandedao.addToCache(text, jsonString.toString(), minConfidence);
+	        
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

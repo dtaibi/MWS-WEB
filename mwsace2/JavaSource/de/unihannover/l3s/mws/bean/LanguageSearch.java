@@ -11,7 +11,7 @@
 package de.unihannover.l3s.mws.bean;
 
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -42,12 +43,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.l3s.interwebj.IllegalResponseException;
+import de.l3s.interwebj.InterWeb;
+import de.l3s.interwebj.jaxb.SearchResponse;
+import de.l3s.interwebj.jaxb.SearchResultEntity;
+import de.unihannover.l3s.mws.dao.BingcacheDao;
+import de.unihannover.l3s.mws.dao.DandelioncacheDao;
 import de.unihannover.l3s.mws.dao.TrackDao;
+import de.unihannover.l3s.mws.dao.UrlContentDao;
 import de.unihannover.l3s.mws.dao.UtenteDao;
 import de.unihannover.l3s.mws.model.Generalsettings;
 import de.unihannover.l3s.mws.model.SearchResult;
 import de.unihannover.l3s.mws.model.SearchWebResult;
 import de.unihannover.l3s.mws.model.Track;
+import de.unihannover.l3s.mws.model.UrlContent;
 import de.unihannover.l3s.mws.util.TextManager;
 import eu.dandelion.DBpediaConnect;
 import eu.dandelion.DandelionDataObject;
@@ -576,12 +585,61 @@ Map<Integer, Integer> indexSearchResult;
 Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String, Map<String, ArrayList<Integer>>>();
 
 
-	private Map<String,Integer> createTagCloud (String q, String lang, String radiowebnews){
+	public Map<String,Integer> createTagCloud (String q, String lang, String radiowebnews) throws IOException {
 		String accountKey = "BmbX+6Sy9/VEcS5oOjurccO5MQpKr2ewvLQ2vRHBKXQ";
 		// accountKey = "1145b358/226e46f8067efd14ea58d05d4b4a25c1";
 		// accountKey="b5e0c812/87ddc4f508e0322abe43b9edd7b4adba";
 		if (radiowebnews.compareTo("web")==0){
 		
+			/*
+			TreeMap<String, String> params = new TreeMap<String, String>();
+
+			params.put("media_types", "text"); // ,image
+			params.put("services", "Bing"); // "YouTube,Vimeo"
+			params.put("number_of_results", "10");
+			params.put("page", "1");
+			params.put("language", lang);
+
+			InterWeb iw = new InterWeb("http://learnweb.l3s.uni-hannover.de/interweb/api/", "3gg1Gw_AhfGzfH8M", "N38V5RkPqp4eT_8-RCj43G96");
+			
+			searchResultWeb = new ArrayList<SearchResult>();
+			try {
+				SearchResponse response = iw.search(q, params);
+				
+				List<String> ripetiz=new ArrayList<String>();
+				UrlContent obj1 = new UrlContent();
+				int temp_counter =1;
+				
+				
+				for(SearchResultEntity result :  response.getQuery().getResults())
+				{
+					
+					if(temp_counter==1)
+					{
+						obj1.SetUrl(result.getUrl());
+						System.out.println(obj1.GetUrl());
+						obj1.SetContent();
+						System.out.println(obj1.GetContent());
+						UrlContentDao ContentSave = new UrlContentDao();
+						ContentSave.SaveURLContent(obj1); 
+						temp_counter++;
+					}
+					SearchWebResult r=new SearchWebResult();
+					r.setTitle(result.getTitle());
+					r.setDescription(result.getDescription());
+					teasers.add(result.getDescription());
+					r.setUrl(result.getUrl());
+					if (!ripetiz.contains(r.getUrl())){
+						ripetiz.add(r.getUrl());
+						searchResultWeb.add(r);
+						
+					}
+				}
+			} catch (IllegalResponseException e) {
+				e.printStackTrace();
+			} */
+			
+			/*
 			AzureSearchWebQuery aq = new AzureSearchWebQuery();
 			aq.setAppid(accountKey);
 			if (lang.compareTo("en")==0)
@@ -619,7 +677,7 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 					ripetiz.add(r.getUrl());
 					searchResultWeb.add(r);
 				}
-			}
+			} */
 	}else{
 		searchResultWeb = new ArrayList<SearchResult>();
         try
@@ -831,6 +889,152 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		
 	}
 	
+	private Map<String,Integer> createTagCloud2 (String lang){
+		if (lang.compareTo("en")==0){
+			this.minconfidence=0.85;
+		}else{
+			this.minconfidence=0.75;
+		}
+
+	System.out.println("Dandelion Start");
+	indexSearchResult=new HashMap<Integer, Integer> ();
+	String textToAnalyse="";
+	for (int index=0;index<searchResultWeb.size();index++){
+		textToAnalyse+=" "+searchResultWeb.get(index).getTitle()+" "+((SearchWebResult)searchResultWeb.get(index)).getDescription();
+		indexSearchResult.put(index, textToAnalyse.length());
+	}	
+	
+	// System.out.println(textToAnalyse);
+	
+	ArrayList<DandelionDataObject> objList = null;
+	Map<String, ArrayList<Integer>> dandemap=new HashMap<String, ArrayList<Integer>>();
+	DBpediaConnect dbpc=new DBpediaConnect();
+	Map<String, Integer> conceptFreq=new HashMap<String,Integer>();
+	DandelioncacheDao dandedao=new DandelioncacheDao();
+	try {
+		if (this.includeFullText.size()==0)
+			objList=EntityExtractionService.postText(textToAnalyse, this.minconfidence);
+		else{
+			objList=new ArrayList<DandelionDataObject>();
+			for (int index=0;index<searchResultWeb.size();index++){
+				String searchweburl = searchResultWeb.get(index).getUrl();
+				// System.out.println(index+"::"+searchweburl);
+				ArrayList<DandelionDataObject> ddo=dandedao.getCache(searchweburl,this.minconfidence);
+				if (ddo==null)
+					ddo=EntityExtractionService.postTextType(searchweburl, "url",this.minconfidence);
+				
+				objList.addAll(ddo);
+				for (DandelionDataObject d:ddo){
+					String key="";
+					if (lang.compareTo("en")!=0){
+						key=dbpc.getEng(d.getUri());
+						key=key.replace("http://dbpedia.org/resource/", "");
+					}else{
+						key = java.net.URLDecoder.decode(d.getUri(), "UTF-8");
+						key=key.replace("http://en.wikipedia.org/wiki/", "");
+					}
+					if (conceptFreq.containsKey(key)){
+						conceptFreq.put(key, conceptFreq.get(key)+1);
+						if (!dandemap.get(key).contains(index))
+							dandemap.get(key).add(index);
+					} else {
+						conceptFreq.put(key,1);
+						dandemap.put(key, new ArrayList<Integer>());
+						dandemap.get(key).add(index);
+					}
+					/*if (freqRel.containsKey(lang+":"+index+":"+key)){
+						freqRel.put(lang+":"+index+":"+key,freqRel.get(lang+":"+index+":"+key)+1);
+					}else{
+						freqRel.put(lang+":"+index+":"+key, 1);
+					}*/
+				}
+			}
+		}
+	
+	} catch (HttpException e) {
+		e.printStackTrace();
+	} catch (UnsupportedEncodingException e) {
+		e.printStackTrace();
+	};
+	
+	
+	if (this.includeFullText.size()==0){
+		for (int i=0; i<objList.size(); i++)	
+		{
+		
+			int f=0;
+			while ((objList.get(i).getWordStartPosition() > indexSearchResult.get(f)) && f<indexSearchResult.size()){
+				f++;
+				// System.out.println(f+"::"+indexSearchResult.get(f)+"::"+indexSearchResult.size()+"::"+objList.get(i).getWordStartPosition());
+			}
+			String key="";
+			if (lang.compareTo("en")!=0){
+				key=dbpc.getEng(objList.get(i).getUri());
+				key=key.replace("http://dbpedia.org/resource/", "");
+			}else{
+				key = objList.get(i).getUri();
+				key=key.replace("http://en.wikipedia.org/wiki/", "");
+			}
+			if (conceptFreq.containsKey(key)){
+				conceptFreq.put(key, conceptFreq.get(key)+1);
+				if (!dandemap.get(key).contains(f))
+					dandemap.get(key).add(f);
+			} else {
+				conceptFreq.put(key,1);
+				dandemap.put(key, new ArrayList<Integer>());
+				dandemap.get(key).add(f);
+			}
+			
+				try {
+					if (objList.get(i).getTypes()!=null)
+						for (int k=0; k<objList.get(i).getTypes().length();k++){
+							String kk=objList.get(i).getTypes().get(k).toString();
+							if (lang.compareTo("en")==0){
+								if (categoryFreq.containsKey(kk)){
+									categoryFreq.put(kk, categoryFreq.get(kk)+1);
+								}else{
+									categoryFreq.put(kk, 1);
+								}
+							}
+							if (lang.compareTo("de")==0){
+								if (categoryFreqDE.containsKey(kk)){
+									categoryFreqDE.put(kk, categoryFreqDE.get(kk)+1);
+								}else{
+									categoryFreqDE.put(kk, 1);
+								}
+							}
+							
+						}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		
+	}
+	indexDandelion.put(lang,dandemap);
+	
+	searchResultWebMap.put(lang, searchResultWeb);	
+	
+	if (lang.compareTo("de")==0){
+		categoryFreqDE=sortByValue(categoryFreqDE);
+		for (String kkk:categoryFreqDE.keySet()){
+			categoryFreqListDE.add(categoryFreqDE.get(kkk)+"::"+kkk);
+		}
+		Collections.reverse((List<?>) categoryFreqListDE);
+	}
+	
+	if (lang.compareTo("en")==0){
+		categoryFreq=sortByValue(categoryFreq);
+		for (String kkk:categoryFreq.keySet()){
+			categoryFreqList.add(categoryFreq.get(kkk)+"::"+kkk);
+		}
+		Collections.reverse((List<?>) categoryFreqList);
+	}
+	
+	return conceptFreq;
+}	
+	
 	public <K, V extends Comparable<? super V>> Map<K, V> 
     sortByValue( Map<K, V> map )
 {
@@ -867,6 +1071,62 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 	}
 
 	
+private void searching(String q,String lang) {
+		
+		System.out.println("Cached value not available "+q+" "+lang);
+		
+		TreeMap<String, String> params = new TreeMap<String, String>();
+
+		params.put("media_types", "text"); // ,image
+		params.put("services", "Bing"); // "YouTube,Vimeo"
+		params.put("number_of_results", ""+this.resultnumber);
+		params.put("page", "1");
+		params.put("language", lang);
+
+		InterWeb iw = new InterWeb("http://learnweb.l3s.uni-hannover.de/interweb/api/", "3gg1Gw_AhfGzfH8M", "N38V5RkPqp4eT_8-RCj43G96");
+		BingcacheDao bcdao=new BingcacheDao();
+		searchResultWeb = new ArrayList<SearchResult>();
+		try {
+			SearchResponse response = iw.search(q, params);
+			
+			List<String> ripetiz=new ArrayList<String>();
+			UrlContent obj1 = new UrlContent();
+			int temp_counter =1;
+			
+			
+			for(SearchResultEntity result :  response.getQuery().getResults())
+			{
+				
+				/*if(temp_counter==1)
+				{
+					obj1.SetUrl(result.getUrl());
+					System.out.println(obj1.GetUrl());
+					obj1.SetContent();
+					System.out.println(obj1.GetContent());
+					UrlContentDao ContentSave = new UrlContentDao();
+					ContentSave.SaveURLContent(obj1); 
+					temp_counter++;
+				}*/
+				SearchWebResult r=new SearchWebResult();
+				r.setTitle(result.getTitle());
+				r.setDescription(result.getDescription());
+				teasers.add(result.getDescription());
+				r.setUrl(result.getUrl());
+				if (!ripetiz.contains(r.getUrl())){
+					ripetiz.add(r.getUrl());
+					searchResultWeb.add(r);
+					
+				}
+				// bcdao.addToCache(r, "BN_"+lang, q+":"+this.resultnumber);
+			}
+		} catch (IllegalResponseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}	
+	
 	public String searcAll(int nuovo) throws IOException{
 		
 		// accountKey = "TTtbr2RdFtN8bvzLZG9SIEgkDa7ecUDNrAkdwEy86UI"; // davide.taibi@libero.it
@@ -879,7 +1139,27 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		q+="\""+searchterms.get(2)+"\"";
 		
 		Map<String, Integer> conceptFreq=new HashMap<String, Integer>();
-		conceptFreq=createTagCloud(q, "de", this.radiowebnews);
+		
+		// TreeMap<String, String> params = new TreeMap<String, String>();
+
+		/*params.put("media_types", "text"); // ,image
+		params.put("services", "Bing"); // "YouTube,Vimeo"
+		params.put("number_of_results", "10");
+		params.put("page", "1");
+		params.put("language", "de");
+
+		InterWeb iw = new InterWeb("http://learnweb.l3s.uni-hannover.de/interweb/api/", "3gg1Gw_AhfGzfH8M", "N38V5RkPqp4eT_8-RCj43G96");
+		*/
+		// searchResultWeb = new ArrayList<SearchResult>();
+		BingcacheDao bcdao=new BingcacheDao();
+		searchResultWeb = bcdao.getCache(q+":"+this.resultnumber, "BN_de");
+		if (searchResultWeb==null)
+			searching(q,"de");
+		
+		conceptFreq=createTagCloud2("de");
+		conceptFreq=sortByValue(conceptFreq);
+		
+		// conceptFreq=createTagCloud(q, "de", this.radiowebnews);
 		
 		tagclouddata=" var wordsde = [ ";
 		for (String key : conceptFreq.keySet()){
@@ -895,7 +1175,14 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		q+="\""+searchterms.get(1)+"\"";
 		// q+=" loc:it language:it ";
 		
-		conceptFreq=createTagCloud(q, "it", this.radiowebnews);			
+		// conceptFreq=createTagCloud(q, "it", this.radiowebnews);			
+		searchResultWeb = bcdao.getCache(q+":"+this.resultnumber, "BN_it");
+		if (searchResultWeb==null)
+			searching(q,"it");
+		
+		conceptFreq=createTagCloud2("it");
+		conceptFreq=sortByValue(conceptFreq);
+		
 		tagclouddatait=" var wordsit = [ ";
 		for (String key : conceptFreq.keySet()){
 			Integer size=conceptFreq.get(key); if (size>12) size=12;
@@ -909,7 +1196,13 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		q+="\""+searchterms.get(3)+"\"";
 		// q+=" loc:fr language:fr ";
 		// System.out.println(q);
-		conceptFreq=createTagCloud(q, "fr", this.radiowebnews);	
+		// conceptFreq=createTagCloud(q, "fr", this.radiowebnews);	
+		searchResultWeb = bcdao.getCache(q+":"+this.resultnumber, "BN_fr");
+		if (searchResultWeb==null)
+			searching(q,"fr");
+		
+		conceptFreq=createTagCloud2("fr");
+		conceptFreq=sortByValue(conceptFreq);
 		tagclouddataes=" var wordses = [ ";
 		for (String key : conceptFreq.keySet()){
 			Integer size=conceptFreq.get(key); if (size>12) size=12;
@@ -922,7 +1215,13 @@ Map<String,Map<String, ArrayList<Integer>>> indexDandelion = new HashMap<String,
 		q+="\""+searchterms.get(0)+"\"";
 		// q+=" language:en ";
 
-		conceptFreq=createTagCloud(q, "en", this.radiowebnews);			
+		searchResultWeb = bcdao.getCache(q+":"+this.resultnumber, "BN_en");
+		if (searchResultWeb==null)
+			searching(q,"en");
+		
+		conceptFreq=createTagCloud2("en");
+		conceptFreq=sortByValue(conceptFreq);
+		// conceptFreq=createTagCloud(q, "en", this.radiowebnews);			
 		tagclouddataen=" var wordsen = [ ";
 		for (String key : conceptFreq.keySet()){
 			Integer size=conceptFreq.get(key); if (size>12) size=12;

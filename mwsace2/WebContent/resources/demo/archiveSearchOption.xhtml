@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<composite:interface>
+	<composite:attribute name="label" />
+	<composite:attribute name="values" required="true" />
+	<composite:attribute name="extend" required="true"
+		method-signature="java.lang.String f()" />
+	<composite:attribute name="action" required="true"
+		method-signature="java.lang.String f()" />
+	<composite:attribute name="submitlabel" />
+	<composite:attribute name="minconfidence" />
+</composite:interface>
+
+
+<composite:implementation>
+	<table>
+		<tr>
+			<td><h:outputText value="#{cc.attrs.label}" /></td>
+			<td><h:inputText id="inputen" value="#{cc.attrs.values[0]}" /></td>
+		</tr>
+		<tr>
+			<td><h:selectBooleanCheckbox value="#{cc.attrs.withtitle}" />
+				Search in Title</td>
+		</tr>
+		<tr>
+			<td><h:selectBooleanCheckbox id="useannoid" value="#{cc.attrs.usesub}" onclick="toggle1()" />
+				Use Annotation</td>
+		</tr>
+		<tr>
+		
+			<td><div id="annline1" style="display:none">Annotation</div></td>
+			<td>
+			<div id="annline2" style="display:none">
+			<h:selectOneMenu value="#{archivesearchstudent.sformsel}">
+					<f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+					<f:selectItems value="#{archivesearchstudent.surfaceformList}" />
+				</h:selectOneMenu>
+				<br />
+				<h:selectBooleanCheckbox id="exmatchid" value="#{cc.attrs.exactmatch}"  />
+				Exact Match for Annotation
+				<br />
+				<h:selectBooleanCheckbox id="useannotitleid" value="#{cc.attrs.useanntitle}"  />
+				Search Annotation in title
+				</div>
+				
+				</td>
+		
+		</tr>
+		<tr>
+			<td>From:</td>
+			<td><rich:calendar locale="US" value="#{archivesearchstudent.sdate}"  />
+			</td>
+		</tr>
+		<tr>
+			<td>To:</td>
+			<td><rich:calendar locale="US" value="#{archivesearchstudent.edate}" /></td>
+		</tr>
+		<tr>
+			<td><h:selectBooleanCheckbox value="#{cc.attrs.useseed}" />
+				Search on Seed URL</td>
+		</tr>
+		<tr><td colspan="2"><a href="#" onclick="showModCat()">Set Categories</a></td></tr>
+		<tr><td colspan="2"><span id="funscore" style="display:none"><a href="#" onclick="showFuncScore()">Set Functional Score</a></span></td></tr>
+	</table>
+	<script>
+			function loadPredefinedQuery(selection){
+				switch(selection){
+				case 1:
+					$("#helloForm\\:searchinput\\:inputen").val('rights');
+					// $("#helloForm\\:searchinput\\:inputde").val('rechte');
+					break;
+				case 2:
+					$("#helloForm\\:searchinput\\:inputen").val('nuclear');
+					$("#helloForm\\:searchinput\\:inputde").val('nuklear');
+					break;
+				}
+			}
+
+			var x = document.getElementById('annline1');
+		    var y = document.getElementById('helloForm:searchinput:useannoid').checked;
+		    var x2 = document.getElementById('annline2');
+		    if (y){
+		    	x.style.display = 'block';
+		    	x2.style.display = 'block';
+		    }
+			
+			function toggle1() {
+			    var x = document.getElementById('annline1');
+			    var y = document.getElementById('helloForm:searchinput:useannoid').checked;
+			    var x2 = document.getElementById('annline2');
+			    var x3 = document.getElementById('funscore');
+			    
+			    if (y){
+			    	x.style.display = 'block';
+			    	x2.style.display = 'block';
+			    	x3.style.display = 'block';
+			    }else{
+			    
+				    if (x.style.display === 'none') {
+				        x.style.display = 'block';
+				    } else {
+				        x.style.display = 'none';
+				    }
+				    
+				    if (x2.style.display === 'none') {
+				        x2.style.display = 'block';
+				    } else {
+				        x2.style.display = 'none';
+				    }
+
+				    if (x3.style.display === 'none') {
+				        x3.style.display = 'block';
+				    } else {
+				        x3.style.display = 'none';
+				    }
+			    }
+			}
+
+			function showModCat(){
+				$('#catModal').modal('show');
+			} ;
+
+			function showFuncScore(){
+				$('#funcscoreModal').modal('show');
+			} ;
+			
+			
+		</script>
+	<a4j:status>
+		<f:facet name="start">
+			<h:graphicImage
+				value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}"
+				alt="ai" />
+		</f:facet>
+	</a4j:status>
+	<br />
+	<br />
+	<h:commandButton value="#{cc.attrs.submitlabel}" >
+		<f:ajax listener="#{cc.attrs.action}" execute="@form"
+			render="@form :out :out2web :ssettingss" />
+	</h:commandButton>
+	<h:commandButton value="Preview Query" >
+		<f:ajax listener="#{archivesearchstudent.saveCats}" execute="@form"
+			render="@form :out :out2web :ssettingss" />
+	</h:commandButton>
+	<br />
+	<br />
+</composite:implementation>
+
+</html>

@@ -26,5 +26,6 @@
     <mapping class="de.unihannover.l3s.mws.model.StoryboardItem" />    
     <mapping class="de.unihannover.l3s.mws.model.SiteSet" />
     <mapping class="de.unihannover.l3s.mws.model.SiteSetItem" />
+    <mapping class="de.unihannover.l3s.mws.model.UrlContent" />
   </session-factory>
 </hibernate-configuration>

@@ -89,6 +89,8 @@ public class User {
 			td.addTrack(track);
 			if (this.utente.getRole().compareTo("wsstudent")==0)
 				return "languageSearchStudent";
+			if (this.utente.getRole().compareTo("wsstudarch")==0)
+				return "archiveSearchStudent";
 			if (this.utente.getRole().compareTo("nosarweb")==0)
 				return "searchListStudent";
 			if (this.utente.getRole().compareTo("nosarweb2")==0)
@@ -97,7 +99,9 @@ public class User {
 				return "hackathon";
 			if (this.utente.getRole().compareTo("external")==0)
 				return "languageSearch";
-			return "basicSearch";
+			if (this.utente.getRole().compareTo("wsstudarch2")==0)
+				return "archiveSearchStudent2";
+			return "basicSearchNew";
 		} else {
 			this.utente = null;
 			return "/pages/login.jsf?faces-redirect=true";

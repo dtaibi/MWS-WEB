@@ -19,7 +19,34 @@
 			  #narrowslider {
 			  	width: 30px;
 			  }
+			  
 		</style>
+		<style>
+#helloForm\:searchinput\:j_idt82DateEditorLayout {
+    background-color: white;
+}
+
+#helloForm\:searchinput\:j_idt82Content {
+    position: absolute;
+    z-index: 3;
+    left: 381px;
+    top: 341px;
+    display: table;
+    background-color: white;
+}
+#helloForm\:searchinput\:j_idt81DateEditorLayout {
+    background-color: white;
+}
+
+#helloForm\:searchinput\:j_idt81Content {
+    position: absolute;
+    z-index: 3;
+    left: 381px;
+    top: 341px;
+    display: table;
+    background-color: white;
+}
+</style>
 		<h:outputStylesheet library="theme" name="css/bootstrap-responsive.css" />
 		<h:outputStylesheet library="theme" name="css/charisma-app.css" />
 		<h:outputStylesheet library="theme" name="css/jquery-ui-1.8.21.custom.css" />
@@ -143,7 +170,7 @@
 			<div class="span2 main-menu-span">
 				
 				<div class="well nav-collapse sidebar-nav">
-					<ui:fragment rendered="#{searchall.user.utente.role != 'wsstudent' and searchall.user.utente.role != 'hackathon' and searchall.user.utente.role != 'external'}">
+					<ui:fragment rendered="#{searchall.user.utente.role != 'wsstudarch' and searchall.user.utente.role != 'wsstudarch2' and searchall.user.utente.role != 'wsstudent' and searchall.user.utente.role != 'hackathon' and searchall.user.utente.role != 'external'}">
 					<ul class="nav nav-tabs nav-stacked main-menu">
 						<li class="nav-header hidden-tablet">Main</li>
 						<li style="margin-left: 0px;"><form><a class="ajax-link" href="#"><i class="icon-home"></i><span class="hidden-tablet"></span></a><a class="ajax-link" href="basicSearch.jsf">Basic Search</a></form></li>
@@ -160,7 +187,7 @@
 						<h:form><li><a class="ajax-link" href="#"><i class="icon-align-justify"></i><span class="hidden-tablet"><h:commandLink action="#{tracks.loadList}" value="Tracks" /></span></a></li></h:form>
 					</ul>
 					</ui:fragment>
-					<ui:fragment rendered="#{searchall.user.utente.role == 'wsstudent' or searchall.user.utente.role == 'hackathon' or searchall.user.utente.role == 'external'}">
+					<ui:fragment rendered="#{searchall.user.utente.role == 'wsstudarch' or searchall.user.utente.role == 'wsstudarch2' or searchall.user.utente.role == 'wsstudent' or searchall.user.utente.role == 'hackathon' or searchall.user.utente.role == 'external'}">
 						<h1 style="margin: 0px 0px 20px 0px">SaR - Web</h1>
 					</ui:fragment>
 				</div><!--/.well -->

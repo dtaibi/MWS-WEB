@@ -40,7 +40,7 @@
 				<a href="#" onclick="loadPredefinedQuery(1)">Children</a>&nbsp;&nbsp;&nbsp;
 				<a href="#" onclick="loadPredefinedQuery(3)">Guantanamo Bay</a>&nbsp;&nbsp;&nbsp;
 				<a href="#" onclick="loadPredefinedQuery(4)">Legal Support</a>&nbsp;&nbsp;&nbsp;
-				<a href="#" onclick="loadPredefinedQuery(2)">Development Rights</a>&nbsp;&nbsp;&nbsp;
+				<!-- a href="#" onclick="loadPredefinedQuery(2)">Development Rights</a -->
 			</td>
 			</tr>
 			</table>
@@ -71,7 +71,7 @@
     		<br />
     		<br />
     		<h:commandButton value="#{cc.attrs.submitlabel}" >
-        		<f:ajax listener="#{cc.attrs.action}" execute="@form" render="@form :searchlistres :out :out2web " />
+        		<f:ajax listener="#{cc.attrs.action}" execute="@form" render="@form :searchlistres :out :out2web :moreinfo" />
     		</h:commandButton>
 			<br /><br />
 	</composite:implementation>

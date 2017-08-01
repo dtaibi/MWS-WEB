@@ -229,7 +229,7 @@ public class Hackathon {
 	}
 	
 	public void showmore(){
-		System.out.println("------- show more -------");
+		// System.out.println("------- show more -------");
 		moreinfo="";
 		ArrayList<CloudItem> added=new ArrayList<CloudItem>();
 		ArrayList<CloudItem> deleted=new ArrayList<CloudItem>();
@@ -258,8 +258,10 @@ public class Hackathon {
 				 moreinfo+="<tr><td>"+ci.getText()+"</td><td>"+ci.getValue()+"</td></tr>";
 			 moreinfo+="</table>";
 			 
-		 }	
-		 System.out.println(moreinfo);
+		 }
+		 if (Integer.parseInt(diff2)==0 && Integer.parseInt(diff1)==0)
+				moreinfo="";
+		 // System.out.println(moreinfo);
 	}
 	
 	public void loadRestriction(){
@@ -556,7 +558,7 @@ public class Hackathon {
 			 
 			 int succ=k+1;
 			 while ((succ<this.searchClouds.size()) && c.sameAs(this.searchClouds.get(succ))){
-				 System.out.println(k+" e "+succ+" sono uguali!");
+				 // System.out.println(k+" e "+succ+" sono uguali!");
 				 succ++;
 			 }
 			 if (succ!=k+1){
@@ -584,7 +586,7 @@ public class Hackathon {
 		 javascriptTimeline+=" ] }'); ";
 		 javascriptTimeline+="timeline = new TL.Timeline('timeline-embed',jsontimeline);";
 		 //System.out.println(javascriptTimeline);
-		
+		moreinfo="";
 		return "languageSearchStudent";	
 	}
 }

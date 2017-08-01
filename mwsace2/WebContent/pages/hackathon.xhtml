@@ -10,7 +10,7 @@
 
 
 <ui:composition template="/templates/hackathon_template.xhtml">
-	<ui:define name="pageTitle">MWS - Search</ui:define>
+	<ui:define name="pageTitle">SaR-Web Search</ui:define>
 	<ui:define name="pageHeader">SaR-Web Search</ui:define>
 
 	<ui:define name="body">
@@ -26,7 +26,7 @@
 		</div>
 
 		<h:panelGroup id="ssettingss">
-			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px; margin-top:20px;" rendered="#{not empty hackathon.searchsettings}">
+			<h:panelGroup styleClass="well" style="width: 300px; float:left; margin-left: 30px; margin-top:0px;" rendered="#{not empty hackathon.searchsettings}">
 				<p><h:outputText value="#{hackathon.searchsettings}" escape="false"/></p>
 			</h:panelGroup>
 		</h:panelGroup>
@@ -68,16 +68,6 @@
 		</div>
 	</div>
 
-
-	<div class="box-header well">
-			
-	</div>
-	<div class="box-content" id="minsearchbtn">
-		<div class="box-content">
-					
-		</div>
-	</div>
-	
 	</ui:define>
 
 
@@ -94,9 +84,40 @@
 		</div>
 		<div class="box-content" id="minsearchbtn">
 			<div class="box-content">
+				
 				<h:panelGroup id="out">
 					<div id="timeline-embed" style="width: 100%; height: 600px"></div>
-    					
+    				
+    				<script>
+    				$('#timeline-embed').delegate(".tl-slidenav-next", "click", function () {
+			    		slidenum++;
+			    		if (slidenum>0){
+			    			var ele=$( ".tl-headline" )[ slidenum ];
+			    			eval(ele.childNodes[0].getAttribute("onclick"));
+			    		}
+					});
+    				$('#timeline-embed').delegate(".tl-slidenav-previous", "click", function () {
+			    		slidenum--;
+			    		if (slidenum>0){
+			    			var ele=$( ".tl-headline" )[ slidenum ];
+			    			eval(ele.childNodes[0].getAttribute("onclick"));
+			    		}
+					});
+    				$('#timeline-embed').delegate(".tl-timemarker", "click", function () {
+    					var idmarker=this.id;
+    					idmarker=idmarker.replace("-marker","");
+    					slidenum=0;
+    					$.each( $(".tl-slide"), function(){
+    						if(this.id==idmarker){
+    							var toeval=this.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].getElementsByTagName("h2")[0];
+    							eval(toeval.childNodes[0].getAttribute("onclick"));
+								return false;
+    						}else
+    							slidenum++;
+    					});
+    				});
+    				
+			</script>
 				</h:panelGroup>
 			</div>
 		</div>
@@ -106,6 +127,7 @@
 		<h:panelGroup id="out2web"> 
 			<script>
     			<h:outputText value="#{hackathon.javascriptTimeline}" escape="false" />
+    			var slidenum=0;
     		</script>
 			<script>
 				<ui:repeat value="#{hackathon.searchClouds}" var="cloud">	
@@ -132,6 +154,7 @@
 			function openAddStoryButton(){
 				$(".addstorybutton").toggle();
 			}
+			
 		</script>
 
 		

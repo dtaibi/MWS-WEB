@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:ez="http://java.sun.com/jsf/composite/demo">
+
+<f:metadata>
+    <f:viewParam name="resultId" value="#{archivesearchstudent.resultId}" />
+</f:metadata>
+
+<ui:composition template="/templates/language_template.xhtml">
+	<ui:define name="pageTitle">MWS - Elastic Search page</ui:define>
+	<ui:define name="pageHeader">Elastic Search</ui:define>
+
+	<ui:define name="body">
+		<div style="float:left;">
+		<h:form id="helloForm" ajaxSubmit="true">
+			<ez:archiveSearchOption id="searchinput"
+				label="Search Term:"
+				values="#{archivesearchstudent.searchterms}" extend="#{archivesearchstudent.extend}"
+				minconfidence="#{archivesearchstudent.minconfidence}"
+				action="#{archivesearchstudent.searcAll(1)}" 
+				usesub="#{archivesearchstudent.usesub}"
+				withtitle="#{archivesearchstudent.withtitle}"
+				useseed="#{archivesearchstudent.useseed}"
+				useanntitle="#{archivesearchstudent.useanntitle}"
+				exactmatch="#{archivesearchstudent.exactmatch}"
+				submitlabel="Start Search" />
+		</h:form>
+
+		</div>
+		
+
+		<a4j:status>
+            <f:facet name="start">
+                <h:graphicImage value="#{resource['theme:img/ajax-loaders/ajax-loader-7.gif']}" alt="ai" />
+            </f:facet>
+        </a4j:status>
+	</ui:define>
+
+
+
+	<ui:define name="searchpanel">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Search Result
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info">Web</a></li>
+				</ul>
+				
+					<div id="myTabContent" class="tab-content">
+						
+						<div class="tab-pane active" id="info">
+				
+				<h:form id="out" ajaxSubmit="true">
+				<!-- h:panelGroup id="out" -->
+				
+					<table
+						class="table table-striped table-bordered bootstrap-datatable">
+						<thead>
+							<tr>
+								<th>Results for Web pages</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- ul class="dashboard-list" -->
+							<ui:repeat value="#{archivesearchstudent.resultlist.entrySet().toArray()}" var="entry">
+    							<tr>	
+    								<td>
+										<h:commandLink action="#{archivesearchstudent.seturlcontent(entry.value.get(0).sceneid)}">
+											<f:ajax render=":scenetranscript" />
+											<h:outputText value="#{entry.value.get(0).title}"  />
+										</h:commandLink>
+										<br />                                                                          
+                                        <h:outputText value="#{entry.value.get(0).url}"  />                                                                                                                                                                                                                                                                                                                                                                                                                                       
+										<br />
+										<h:outputText value="#{entry.value.get(0).description}" escape="false" />
+										<br />
+										<h:panelGroup rendered="#{entry.value.size() > 1}">Aggregated: <h:outputText value="#{entry.value.size()}" escape="false" />&nbsp;&nbsp;<a href="#" onclick="event.preventDefault(); showList(#{entry.key})">Show/Hide</a></h:panelGroup>
+										<div style="display: none; background-color: #DDD;" id="idtree_#{entry.key}">
+											<ui:repeat value="#{entry.value}" var="result" rendered="#{entry.value.size() > 1}">
+												<h:commandLink action="#{archivesearchstudent.seturlcontent(result.sceneid)}">
+    												<f:ajax render=":scenetranscript" />
+   													<h:outputText value="#{result.title}"  />
+												</h:commandLink>
+												<br />
+	                						<h:outputText value="#{result.description}" escape="false" />
+	                						<br />
+											</ui:repeat>
+										</div>
+									</td>
+   								</tr>	
+							</ui:repeat>
+							
+							
+							<!--  /ul -->
+						</tbody>
+					</table>
+
+					
+							
+				<!--  /h:panelGroup -->
+			</h:form>
+							<script>
+								function showList(divid){
+									 var x = document.getElementById('idtree_'+divid);
+									    
+									    
+										    if (x.style.display === 'none') {
+										        x.style.display = 'block';
+										    } else {
+										        x.style.display = 'none';
+										    }
+								}
+							</script>
+					<h:panelGroup id="scenetranscript">
+						<h:outputText value="#{archivesearchstudent.scenepopup}" escape="false" />
+					</h:panelGroup>	
+				</div>
+				
+				</div>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="chartpanel1">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-th"></i> Concept Cloud Panel
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="cbtn1" class="icon-chevron-down"></i></a> 
+				<a href="#"	class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minchartbtn1">
+			<div class="box-content">
+			
+				<ul class="nav nav-tabs" id="myTab">
+					<li class="active"><a href="#info2">Concept Cloud</a></li>
+				</ul>
+				<h:panelGroup id="out_tag">
+						<div id="demoen" style="height: 500px;"></div>			
+				</h:panelGroup>
+				
+				</div>
+			</div>
+	</ui:define>
+
+	<ui:define name="searchpanellist">
+		<div class="box-header well">
+			<h2>
+				<i class="icon-list"></i> Search Query
+			</h2>
+			<div class="box-icon">
+				<a href="#" class="btn btn-minimize btn-round"><i id="sbtn"
+					class="icon-chevron-down"></i></a> <a href="#"
+					class="btn btn-close btn-round"><i class="icon-remove"></i></a>
+			</div>
+		</div>
+		<div class="box-content" id="minsearchbtn">
+			<div class="box-content">
+				search query: 
+				<h:outputText id="ssettingss" value="#{archivesearchstudent.searchquery}" />
+			</div>
+		</div>
+			
+	</ui:define>	
+
+	<ui:define name="piechartdata">
+		<h:panelGroup id="contextmenuscript">
+			
+		</h:panelGroup>
+		<h:panelGroup id="out2web"> 
+		
+			<script>
+				<h:outputText value="#{archivesearchstudent.tagclouddata}" escape="false" />
+			</script>
+		
+			<script type="text/javascript">
+				/* <![CDATA[ */
+				$('.datatable1').dataTable({
+					"sPaginationType": "bootstrap",
+					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+					"bFilter": false, 
+					"dom": 'lifrtp',
+					"oLanguage": {
+					"sLengthMenu": "_MENU_ records per page"
+					}
+				} );									
+				/* ]]> */
+			</script>
+		</h:panelGroup>
+
+		<h:panelGroup id="scriptstoryboad">
+		
+		<script type="text/javascript">
+			/* <![CDATA[ */
+            function sortatest(data) {
+				if (data.status === 'success') {
+					$( ".column" ).sortable("refresh");
+					$( ".portlet" )
+				      .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" );
+			      	$( ".portlet-header" )
+				      .addClass( "ui-widget-header ui-corner-all" );
+			        $( ".portlet-header" ).prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+				}
+			}
+  		    /* ]]> */
+   		</script>
+		</h:panelGroup>
+		<script>
+			
+			var fill = d3.scale.category20();
+		    function drawen(words) {
+		        d3.select("#demoen").append("svg")
+		            .attr("width", 1000)
+		            .attr("height", 500)
+		          .append("g")
+		            .attr("transform", "translate(500,250)")
+		          .selectAll("text")
+		            .data(words)
+		          .enter().append("text")
+		            .style("font-size", function(d) { return d.size + "px"; })
+		            .style("font-family", "Impact")
+		            .style("fill", function(d, i) { return fill(i); })
+		            .attr("text-anchor", "middle")
+		            .attr("transform", function(d) {
+		              return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+		            })
+		            .text(function(d) { return d.text; })
+		            .on("click", function(d) {
+		    			showen(d.text);
+		  			});;
+		      }
+			
+		</script>
+		<div class="modal hide fade" id="funcscoreModal">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>Setting Functional Score</h3>
+			</div>
+			<div class="modal-body">
+				<h:form id="modalfunctscore" ajaxSubmit="true">
+					<table>
+						<tr>
+							<td>field_value_factor</td>
+							<td>
+							<h:selectOneMenu value="#{archivesearchstudent.field_value_factor}">
+								<f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+								<f:selectItem itemValue="anno" itemLabel="annotation" />
+								<f:selectItem itemValue="titleAnno" itemLabel="titleAnno" />
+							</h:selectOneMenu>
+							</td>
+						</tr>
+						<tr>
+							<td>modifier</td>
+							<td>
+							<h:selectOneMenu value="#{archivesearchstudent.modifier}">
+								<f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+								<f:selectItems value="#{archivesearchstudent.funcscore.modifierList}" />
+							</h:selectOneMenu>
+							</td>
+						</tr>
+						<tr>
+					<td>factor</td>
+					<td><rich:inputNumberSlider value="#{archivesearchstudent.factor}" id="slid1" maxValue="5" step="0.2" showArrows="false" showInput = "false" showTooltip="true" /></td>
+					</tr>
+					<tr>
+					<td>Score Mode</td>
+					<td>
+					<h:selectOneMenu value="#{archivesearchstudent.score_mode}">
+						<f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+						<f:selectItems value="#{archivesearchstudent.funcscore.score_modeList}" />
+					</h:selectOneMenu>
+					</td>
+					</tr>
+					<tr>
+					<td>Boost Mode</td>
+					<td>
+					<h:selectOneMenu value="#{archivesearchstudent.boost_mode}">
+						<f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+						<f:selectItems value="#{archivesearchstudent.funcscore.boost_modeList}" />
+					</h:selectOneMenu>
+					</td>
+					</tr>
+					<tr>
+					<td>
+					<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{archivesearchstudent.saveCats}" >
+						<f:ajax execute="@form" render=":ssettingss" onevent="closimi3" />
+	    			</h:commandButton>
+	    			</td>
+	    			</tr>
+	    			</table>
+				</h:form>
+				<script>
+   				function closimi3(data) {
+   				    if (data.status === 'success') {
+   				    	$("#funcscoreModal").modal('hide');
+   				    }
+   				}
+   				</script>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+		
+		
+		<div class="modal hide fade" id="catModal">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>Setting Categories</h3>
+			</div>
+			<div class="modal-body">
+				<h:form id="modalcats" ajaxSubmit="true">
+				
+				<table>
+				<tr>	
+   				<td>Is included</td>
+   				<td>Category</td>
+   				<td>Boost Value</td>
+   				<td>has negative Boost</td>
+   				<td>must not</td>
+   				</tr>
+   				
+   				
+   				<ui:repeat value="#{archivesearchstudent.catmap.entrySet().toArray()}" var="entry2">
+    				<tr>
+    					<td><h:selectBooleanCheckbox value="#{entry2.value.included}"  /></td>
+   						<td>#{entry.key}</td>
+   						<td><rich:inputNumberSlider value="#{entry2.value.positiveBoost}" id="narrowslider1" maxValue="5" step="0.2" showArrows="false" showInput = "false" showTooltip="true" /></td>
+   						<td><h:selectBooleanCheckbox value="#{entry2.value.hasNegativeBoost}"  /></td>
+   						<td><h:selectBooleanCheckbox value="#{entry2.value.mustnot}"  /></td>
+   					</tr>	
+				</ui:repeat>
+					<tr>
+						<td>
+							<div>Negative Boost (if any):</div>
+						</td>
+						<td>
+							<div><rich:inputNumberSlider value="#{archivesearchstudent.negativeboost}" id="narrowslider1" minValue="-1.0" maxValue="0" step="0.1" showArrows="false" showInput = "false" showTooltip="true" /></div>
+						</td>
+					</tr>
+   				</table>
+   				<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{archivesearchstudent.saveCats}" >
+					<f:ajax execute="@form" render=":ssettingss" onevent="closimi2" />
+    			</h:commandButton>
+   				</h:form>
+			
+   				<script>
+   				function closimi2(data) {
+   				    if (data.status === 'success') {
+   				    	$("#catModal").modal('hide');
+   				    }
+   				}
+   				</script>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+	</ui:define>
+	<ui:define name="modal">
+		
+		<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>Settings</h3>
+			</div>
+			<div class="modal-body">
+				<h:form id="modallang" ajaxSubmit="true">
+				
+				<table>
+				<tr>	
+   				<td>Number of results:</td>
+   				<td><rich:inputNumberSpinner value="#{archivesearchstudent.resultnumber}" id="narrowspinner" cycled="false" step="5" minValue="5" maxValue="50" /></td>
+   				</tr>
+   				<tr>	
+   				<td>Jaccard similarity threshold:</td>
+   				<td><rich:inputNumberSlider value="#{archivesearchstudent.jthreshold}" id="narrowslider0" maxValue="1" step="0.1" showArrows="false" showInput = "false" showTooltip="true" /></td>
+   				</tr>
+   				<tr>	
+   				<td>Boost Value (Content):</td>
+   				<td><rich:inputNumberSlider value="#{archivesearchstudent.boostContent}" id="narrowslider4" maxValue="10" step="0.5" showArrows="false" showInput = "false" showTooltip="true" /></td>
+   				</tr>
+   				<tr>	
+   				<td>Boost Value (Title):</td>
+   				<td><rich:inputNumberSlider value="#{archivesearchstudent.boostTitle}" id="narrowslider1" maxValue="10" step="0.5" showArrows="false" showInput = "false" showTooltip="true" /></td>
+   				</tr>
+   				<tr>
+   				<td>Boost Value (Annotation):</td>
+   				<td><rich:inputNumberSlider value="#{archivesearchstudent.boostAnn}" id="narrowslider2" maxValue="10" step="0.5" showArrows="false" showInput = "false" showTooltip="true"/></td>
+   				</tr>
+   				<tr>
+   				<td>Boost Value (Annotation Title):</td>
+   				<td><rich:inputNumberSlider value="#{archivesearchstudent.boostAnnTitle}" id="narrowslider3" maxValue="10" step="0.5" showArrows="false" showInput = "false" showTooltip="true"/></td>
+   				</tr>
+   				</table>
+   				<h:commandButton value="Save changes" styleClass="btn btn-primary" action="#{archivesearchstudent.loadRestriction}" >
+					<f:ajax execute="@form" render=":ssettingss" onevent="closimi" />
+    			</h:commandButton>
+   				</h:form>
+			
+   				<script>
+   				function closimi(data) {
+   				    if (data.status === 'success') {
+   				    	$("#myModal").modal('hide');
+   				    }
+   				}
+   				</script>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn" data-dismiss="modal">Close</a>
+			</div>
+			<script>
+				$(document).ready(function(){
+					$('#minchartbtn1').hide();
+				});
+			</script>
+	</ui:define>
+</ui:composition>
+</html>
