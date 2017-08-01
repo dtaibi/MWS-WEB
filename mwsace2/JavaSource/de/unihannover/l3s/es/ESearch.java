@@ -35,7 +35,7 @@ public  List<ESearchDataObject> searhByContent(String query, int noOfResults)
 	
 	httpClient.getCredentialsProvider().setCredentials(
             new AuthScope("194.119.209.206", 9200),
-            new UsernamePasswordCredentials("admin", "mws_sar_pwd"));
+            new UsernamePasswordCredentials(<USER>, <PASSWORD>));
 	
 	// URIBuilder builder;
 	HttpGet method;
